@@ -247,9 +247,13 @@
         var zero = lead && lead.firstChild && lead.firstChild.nodeType === 3 ? (function () { var r = d.createRange(); r.selectNodeContents(lead.firstChild); return r.getBoundingClientRect(); })() : null;
         [zero, roll && roll.getBoundingClientRect(), box(sec.querySelector('.lede'))].forEach(function (b) { if (b && b.width) keep.push(b); });
         /* the portrait: its square is mostly empty, so only where the person is (the middle for the head, the whole width for the shoulders) */
-        var w = who && who.getBoundingClientRect();
-        if (w && w.width) { keep.push({ left: w.left + w.width * 0.22, right: w.right - w.width * 0.22, top: w.top, bottom: w.bottom }, { left: w.left, right: w.right, top: w.top + w.height * 0.66, bottom: w.bottom }); }
-        var jmin = Math.ceil((sr.top + 96 - line) / s.c), jmax = Math.floor((sr.bottom - 36 - line) / s.c), rows = {}, free = [];
+        /* (below 900px the portrait stands behind the type, unseen until the wave, so the dots may cross it: keeping
+           them off it there left them almost nowhere to go, 2026-11-15) */
+        var w = who && who.getBoundingClientRect(), behind = !!(window.matchMedia && matchMedia('(max-width: 899px)').matches);
+        if (w && w.width && !behind) { keep.push({ left: w.left + w.width * 0.22, right: w.right - w.width * 0.22, top: w.top, bottom: w.bottom }, { left: w.left, right: w.right, top: w.top + w.height * 0.66, bottom: w.bottom }); }
+        /* not in the hero's last 110px either, where the grid fades out (css/heroes-c.css, .body::after): a dot there
+           would be washed out */
+        var jmin = Math.ceil((sr.top + 96 - line) / s.c), jmax = Math.floor((sr.bottom - 124 - line) / s.c), rows = {}, free = [];
         for (var j = jmin; j <= jmax; j++) {
           if (j === 0 || j === 1) continue;
           for (var i = 0; i <= cols; i++) {
