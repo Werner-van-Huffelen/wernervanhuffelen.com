@@ -38,9 +38,10 @@
     /* the grid the wave runs on: the hero's own where there is one (its squares and lines, so the wave lands on them),
        otherwise the same squares (1/32 of the width between the margins, 1/16 on a phone) from the left margin */
     var lattice = function () {
-      var g = d.querySelector('.cx-1 .grid'), W = r.clientWidth, s, gr, m;
+      var g = d.querySelector('.cx-1 .grid'), W = r.clientWidth, s, gr, m, sc, cs;
       if (g) {
-        s = parseFloat(getComputedStyle(g).backgroundSize); gr = g.getBoundingClientRect(); m = parseFloat(getComputedStyle(g.closest('.cx-1')).paddingLeft);
+        sc = g.closest('.cx-1'); cs = getComputedStyle(sc); gr = g.getBoundingClientRect(); m = parseFloat(cs.paddingLeft);
+        s = (sc.getBoundingClientRect().width - m - parseFloat(cs.paddingRight)) / (parseFloat(cs.getPropertyValue('--cols')) || 32);   /* as js/heroes.js measures it */
         if (s > 0) return { c: s, x0: gr.left + m, y0: gr.top + 1200 };
       }
       m = parseFloat(getComputedStyle(d.querySelector('.foot') || d.body).paddingLeft) || 16;

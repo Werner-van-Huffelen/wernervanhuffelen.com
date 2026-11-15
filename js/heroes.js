@@ -73,7 +73,10 @@
     var grid = sec.querySelector('.grid'), dot = sec.querySelector('.ruler .dot'), last = '', run = 0, still = false;
     if (!grid) return;
     try { still = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* keep moving */ }
-    function size() { return { c: parseFloat(getComputedStyle(grid).backgroundSize), m: parseFloat(getComputedStyle(sec).paddingLeft), r: grid.getBoundingClientRect() }; }
+    function size() {                                                      /* a square: the ruler's travel (the section's content width) over --cols, as css/heroes-c.css draws it (it was read off the grid's tile, which is no longer a tile) */
+      var cs = getComputedStyle(sec), m = parseFloat(cs.paddingLeft), w = sec.getBoundingClientRect().width - m - parseFloat(cs.paddingRight);
+      return { c: w / (parseFloat(cs.getPropertyValue('--cols')) || 32), m: m, r: grid.getBoundingClientRect() };
+    }
     function light(i, j, s) {
       var el = d.createElement('i');
       el.className = 'lit'; el.style.left = (s.m + i * s.c) + 'px'; el.style.top = (1200 + j * s.c) + 'px';

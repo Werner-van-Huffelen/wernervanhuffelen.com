@@ -47,8 +47,13 @@
    under the pointer gets a .lit (js/heroes.js), which glows and fades. */
 .cx-1{container-type:inline-size;--c:3.125cqw;--cols:32}                /* --cols: squares across the ruler */
 @media (max-width:760px){ .cx-1{--c:6.25cqw;--cols:16} }
+/* 2026-11-15 (Werner, on his phone: "the timeline and text and dots on the hero are not aligned on the grid"): the
+   lines are one repeating gradient over the whole grid, not a square tile repeated. Safari rounds a repeated tile
+   to whole device pixels (a 22.56px square is drawn 22.67px), and the error added up square by square, a pixel or
+   two off by the timeline's end and more towards the hero's top, while the ticks, the dots and the full stop sit
+   where the squares really are. A repeating gradient has nothing to round: its lines fall at m + k·c exactly */
 .cx-1 .grid{position:absolute;left:0;right:0;top:-1201px;height:2400px;z-index:-1;pointer-events:none;
-  background:linear-gradient(var(--line) 1px,transparent 1px) var(--m) 1200px / var(--c) var(--c),linear-gradient(90deg,var(--line) 1px,transparent 1px) var(--m) 1200px / var(--c) var(--c);
+  background:repeating-linear-gradient(180deg,var(--line) 1200px,var(--line) 1201px,transparent 1201px,transparent calc(1200px + var(--c))),repeating-linear-gradient(90deg,var(--line) var(--m),var(--line) calc(var(--m) + 1px),transparent calc(var(--m) + 1px),transparent calc(var(--m) + var(--c)));
   -webkit-mask-image:radial-gradient(ellipse 74% 30% at 56% 50%,#000 30%,transparent 100%);mask-image:radial-gradient(ellipse 74% 30% at 56% 50%,#000 30%,transparent 100%)}
 .cx-1 .grid .pin{left:calc(var(--m) + var(--c) * var(--i));top:calc(1200px + var(--c) * var(--j))}
 /* 2026-11-15 (Werner): the grid does not end on a hard edge. The hero clips what reaches past its foot (heroes.css:

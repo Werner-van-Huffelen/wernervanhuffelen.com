@@ -257,8 +257,10 @@ html.lb-open{overflow:hidden}
 /* the grid behind him (Werner, later that day): the page's own squares, counted from the left margin and up from the
    rule he stands on, fading out towards the frame's edges as the hero's grid does. The horizontal lines sit 1px lower
    than the box's padding edge, so that they fall where the 1px rules beside him do (a rule is drawn from its top edge) */
+/* (as one repeating gradient, not a square tile repeated, since 2026-11-15: Safari rounds a tile to whole device pixels
+   and the lines drifted off the rules beside him; see css/heroes-c.css, the hero's grid. Counted up from the foot) */
 .portrait::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(var(--line) 1px,transparent 1px) 0 calc(100% + 1px) / var(--c) var(--c),linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 100% / var(--c) var(--c);
+  background:repeating-linear-gradient(0deg,var(--line) -2px,var(--line) -1px,transparent -1px,transparent calc(var(--c) - 2px)),repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px var(--c));
   -webkit-mask-image:radial-gradient(ellipse 72% 64% at 50% 62%,#000 32%,transparent 100%);mask-image:radial-gradient(ellipse 72% 64% at 50% 62%,#000 32%,transparent 100%)}
 .about>.say{margin-top:14px}
 .say{font-size:clamp(1.8rem,8vw,4.5rem);line-height:1.02;font-weight:400;letter-spacing:-.04em;text-wrap:balance}   /* below 900px (the desktop rule below sets its own): three balanced lines, set to fill the width (Werner, 2026-11-15: "fill out text") */
@@ -318,7 +320,7 @@ html.lb-open{overflow:hidden}
    dark, so the logos are ink and the grid's lines violet. */
 .strip{container-type:inline-size;border-radius:var(--r);background:var(--lav);overflow:hidden}
 .marq{--c:3.125cqw;position:relative;display:grid;align-items:center;height:calc(var(--c) * 4);
-  background:linear-gradient(rgba(124,107,255,.24) 1px,transparent 1px) 0 -1px / var(--c) var(--c),linear-gradient(90deg,rgba(124,107,255,.24) 1px,transparent 1px) -1px 0 / var(--c) var(--c)}
+  background:repeating-linear-gradient(180deg,rgba(124,107,255,.24) -1px,rgba(124,107,255,.24) 0px,transparent 0px,transparent calc(var(--c) - 1px)),repeating-linear-gradient(90deg,rgba(124,107,255,.24) -1px,rgba(124,107,255,.24) 0px,transparent 0px,transparent calc(var(--c) - 1px))}   /* one repeating gradient, not a tile (2026-11-15): Safari rounds a tile, see css/heroes-c.css */
 @media (max-width:760px){ .marq{--c:6.25cqw} }
 @supports (width:round(nearest,1px,1px)){ .marq{height:round(nearest,170px,var(--c))} }
 .belt{overflow:hidden}
