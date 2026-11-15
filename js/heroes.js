@@ -214,7 +214,7 @@
       var s = size();
       if (!s.c) return;
       var gx = (e.clientX - s.r.left - s.m) / s.c, gy = (e.clientY - s.r.top - 1200) / s.c, i = Math.floor(gx), j = Math.floor(gy), key = i + ',' + j;
-      var k = frame(s), on = false;
+      var k = e.pointerType === 'touch' ? 0 : frame(s), on = false;       /* a finger does not brush the picture in: only the wave shows it */
       if (k) {
         on = brush(gx - i0, gy + k) > 0 && has(i - i0, j + k);              /* on the picture itself the brush is the light */
         who.style.setProperty('--hx', ((gx - i0) * s.c).toFixed(1) + 'px'); who.style.setProperty('--hy', ((gy + k) * s.c).toFixed(1) + 'px');

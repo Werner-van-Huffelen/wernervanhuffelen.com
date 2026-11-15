@@ -31,8 +31,8 @@
    IS the timeline, and every eighth vertical line meets a tick. A square is 1/32 of the ruler's length (1/16 on a
    phone), set in cqw: the section is the container and its content box is exactly the ruler's travel. The square
    under the pointer gets a .lit (js/heroes.js), which glows and fades. */
-.cx-1{container-type:inline-size;--c:3.125cqw}
-@media (max-width:760px){ .cx-1{--c:6.25cqw} }
+.cx-1{container-type:inline-size;--c:3.125cqw;--cols:32}                /* --cols: squares across the ruler */
+@media (max-width:760px){ .cx-1{--c:6.25cqw;--cols:16} }
 .cx-1 .grid{position:absolute;left:0;right:0;top:-1201px;height:2400px;z-index:-1;pointer-events:none;
   background:linear-gradient(var(--line) 1px,transparent 1px) var(--m) 1200px / var(--c) var(--c),linear-gradient(90deg,var(--line) 1px,transparent 1px) var(--m) 1200px / var(--c) var(--c);
   -webkit-mask-image:radial-gradient(ellipse 74% 30% at 56% 50%,#000 30%,transparent 100%);mask-image:radial-gradient(ellipse 74% 30% at 56% 50%,#000 30%,transparent 100%)}
@@ -50,11 +50,20 @@
    squares over it light up: js/heroes.js lays a .px on each of those squares, a lit square holding its own piece of
    the picture (--x, --y: the square, counted from the portrait's top left; --n: squares per side; --img: the file).
    A soft light (.halo) travels with the pointer behind them. Without JS, or with reduced motion, the picture simply
-   shows. Not on a narrow screen: the headline needs the room. */
+   shows. Not beside the headline on a narrow screen: it needs the room. There (2026-11-15, Werner: on mobile, the
+   picture behind the text, revealed only by the ripple after the timeline has loaded) the portrait stands on the
+   timeline behind the type, as wide as the ruler on a phone (the right half of it on a tablet), and nothing shows it
+   but the wave: js/heroes.js leaves the touch brush off. With reduced motion, or without JS, there is no wave, so
+   there it stays away rather than sit behind the words. */
 .cx-1 .who{display:none}
 @media (min-width:900px){
   .cx-1 .who{display:block;position:absolute;z-index:-1;left:calc(var(--m) + var(--c) * 24);bottom:calc(100% + 1px);width:calc(var(--c) * 12);aspect-ratio:1;transform:translateX(-50%);pointer-events:none}
   @supports (width:round(down,1px,1px)){ .cx-1 .who{width:round(down,min(calc(var(--c) * 16),calc(100svh - 250px),720px),calc(var(--c) * 2))} }
+}
+@media (max-width:899px) and (prefers-reduced-motion:no-preference){
+  .js .cx-1 .who{--w:calc(var(--c) * 16);display:block;position:absolute;z-index:-1;bottom:calc(100% + 1px);width:var(--w);aspect-ratio:1;pointer-events:none;
+    left:calc(var(--m) + var(--c) * (var(--cols) - 16) + (var(--c) * 16 - var(--w)) / 2)}
+  @supports (width:round(down,1px,1px)){ .js .cx-1 .who{--w:round(down,min(calc(var(--c) * 16),calc(100svh - 250px)),calc(var(--c) * 2))} }
 }
 .cx-1 .who img{display:block;width:100%;height:100%}
 .js .cx-1 .who img{opacity:0}

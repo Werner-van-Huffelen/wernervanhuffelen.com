@@ -129,6 +129,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
    the grid behind the images on the case study cards"), and he took it out again. The tints (.lav, .mat, .night) stay */
 .panel .cell{flex:1;display:flex;flex-direction:column;min-height:0}
 .panel .mat{flex:1;min-height:220px}
+/* 2026-11-15 (Werner): where the card's two halves stack (below 900px) the picture comes first, above the text. Only the
+   look changes: the text stays first in the page's order, so a screen reader reads the name before the picture */
+@media (max-width:899px){ .card .panel{order:-1} }
 @media (min-width:900px){
   .stack{--top:84px;--step:14px}
   .card{grid-template-columns:5fr 7fr;min-height:min(640px,calc(100vh - 176px))}
