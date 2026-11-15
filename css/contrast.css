@@ -127,7 +127,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* a card's tags: the skills the case used, from the CV's list and the Skills section's. Down one list; where the card's text
    column is wide enough (on a phone and in the 900 to 1099px band, where it is not, it stays one list), in two columns of three */
 .card .tags{display:grid;gap:0 clamp(16px,2vw,28px)}
-@media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags:not(.few){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column} }
+@media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags:not(.few){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:0} .card .tags:not(.few) li:nth-child(n+4){padding-left:clamp(16px,2vw,28px)} }   /* 2026-11-15 (Werner): the rules run on across the two columns; the space between them is now the second column's own */
 .card .foot-row{display:flex;align-items:center;justify-content:space-between}
 .card:hover .go{background:var(--stop);border-color:var(--stop);color:#fff}
 .panel{position:relative;display:flex;flex-direction:column;min-height:300px;padding:clamp(16px,2vw,28px);background:var(--tint,var(--mat))}
