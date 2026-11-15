@@ -35,6 +35,10 @@
   .cx .lead-in .lede{font-size:clamp(1.0625rem,2.2vw,1.3125rem);max-width:24em}
 }
 .cx .under{grid-template-columns:minmax(0,1fr);padding-top:18px}
+/* 2026-11-15 (Werner): the note under the timeline ("Getting sh*t done since 2015") moved to the Experience header.
+   Its room stays (18px and two 11px lines): the timeline keeps its place 146px over the hero's foot, which the grid's
+   fade, the dots and the sideways-phone layout are measured from */
+.cx .under{min-height:calc(18px + 2 * 1.45 * .6875rem)}
 @media (min-width:900px){ .cx .under{grid-template-columns:minmax(0,1fr)} }
 
 /* 1 · grid. The grid is a child of the ruler, so it is drawn from the timeline outwards: one of its horizontal lines
