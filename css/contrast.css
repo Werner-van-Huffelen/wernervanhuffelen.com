@@ -19,6 +19,9 @@
   --out:cubic-bezier(.16,1,.3,1); --back:cubic-bezier(.34,1.56,.64,1);
 }
 @media (min-width:761px){ :root{ --m:20px; --g:16px; } }
+/* 2026-11-15 (Werner: "increase the padding on the desktop version to 80px left and right"): the page margin grows from
+   20px at 900px wide to 80px at 1200px and stays there, so a laptop narrower than that is not squeezed */
+@media (min-width:900px){ :root{ --m:clamp(20px,calc(20px + (100vw - 900px) * .2),80px); } }
 
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:88px}
@@ -127,6 +130,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* a card's tags: the skills the case used, from the CV's list and the Skills section's. Down one list; where the card's text
    column is wide enough (on a phone and in the 900 to 1099px band, where it is not, it stays one list), in two columns of three */
 .card .tags{display:grid;gap:0 clamp(16px,2vw,28px)}
+@media (max-width:519px){ .card .tags li:nth-child(n+4){display:none} }   /* 2026-11-15 (Werner: the cards too big on a phone): there, a card shows its first three tags; the case page has them all */
 @media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags:not(.few){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:0} .card .tags:not(.few) li:nth-child(n+4){padding-left:clamp(16px,2vw,28px)} }   /* 2026-11-15 (Werner): the rules run on across the two columns; the space between them is now the second column's own */
 .card .foot-row{display:flex;align-items:center;justify-content:space-between}
 .card:hover .go{background:var(--stop);border-color:var(--stop);color:#fff}
@@ -436,12 +440,28 @@ html:not(.js) .svc .tog{display:none}
 .cells>div+div{padding-left:16px;border-left:1px solid var(--line)}
 .cells dd{font-size:clamp(1.0625rem,1.5vw,1.375rem);font-weight:500;letter-spacing:-.02em;line-height:1.15}
 .cells .pin{left:0;top:0}
-@media (max-width:760px){ .cells>div:nth-child(odd){padding-left:0;border-left:0} .cells>div:nth-child(n+3){border-top:1px solid var(--line)} .cells .pin{display:none} }
+/* on a phone, two facts a row. 2026-11-15 (Werner, a screenshot: "fix this broken line"): the rule between the rows ran
+   only under the first column and started at the margin, where the rules above and below run to the page's edges. The
+   facts now reach the edges themselves (the margin is inside them), so every rule runs edge to edge, and a fact left
+   alone on the last row (three facts) takes the whole row */
+@media (max-width:760px){
+  .cells{padding-inline:0}
+  .cells>div:nth-child(odd){padding-left:var(--m);border-left:0}
+  .cells>div:nth-child(even){padding-right:var(--m)}
+  .cells>div:last-child:nth-child(odd){grid-column:1 / -1}
+  .cells>div:nth-child(n+3){border-top:1px solid var(--line)}
+  .cells .pin{display:none}
+}
 @media (min-width:761px){ .cells{grid-template-columns:repeat(4,minmax(0,1fr))} }
 .told{row-gap:10px;padding-top:clamp(56px,7vw,112px)}
 .told>*{grid-column:1 / -1}
 .told p{font-size:clamp(1.375rem,2.5vw,2.25rem);line-height:1.14;letter-spacing:-.03em;max-width:25em;text-wrap:pretty}
-@media (min-width:900px){ .told>.lab{grid-column:1 / span 4;padding-top:.7em} .told>p,.told>.con{grid-column:5 / span 8} }
+@media (min-width:900px){ .told>.lab{grid-column:1 / span 4;padding-top:.7em} .told>p,.told>.con,.told>.ctags{grid-column:5 / span 8} }
+/* a case page's skills (2026-11-15, Werner: "add the tags on the case study pages"): the card's tags, in two columns (three
+   from 900px), the rules running on across them as on the cards */
+.ctags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.ctags li{min-width:0;padding-right:12px;font-size:clamp(.9375rem,1.1vw,1.0625rem)}
+@media (min-width:900px){ .told>.lab{align-self:start} .ctags{grid-template-columns:repeat(3,minmax(0,1fr))} }
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px var(--g);margin-top:clamp(56px,7vw,112px);padding-top:18px;border-top:1px solid var(--line)}
 .stat b{display:block;font-size:clamp(3.25rem,7vw,6.5rem);font-weight:640;letter-spacing:-.06em;line-height:.9;color:var(--stop);font-variant-numeric:tabular-nums}
 .stat b.sm{font-size:clamp(2.25rem,4.2vw,4rem);line-height:1.46}
