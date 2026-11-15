@@ -18,10 +18,14 @@
   --sans:"Inter Tight","Helvetica Neue",Arial,sans-serif; --display:"Funnel Display","Helvetica Neue",Arial,sans-serif; --mono:"Fragment Mono",ui-monospace,Menlo,monospace;
   --out:cubic-bezier(.16,1,.3,1); --back:cubic-bezier(.34,1.56,.64,1);
   --on-ink:#fff; --sh:18,16,22; color-scheme:light;                         /* --on-ink: what stands on ink (a pill's label); --sh: shadows, as r,g,b */
+  --acc:124,107,255; --on-stop:#fff;                                        /* --acc: the accent (--stop) as r,g,b, for its glows, lines and lit squares; --on-stop: what stands on it */
 }
 /* dark (2026-11-15, Werner: "create a dark mode version"): the same page at night. It follows the system's setting until
    the button in the nav picks one, which the page then keeps (js/contrast.js; the script in the head sets it before the
-   first paint). The violet and the contact panel stay as they are; the paper, ink and lines turn over */
+   first paint). The paper, ink and lines turn over; the violet stays, and its light purple grounds (--lav) turn a deep
+   violet. (Later that day the dark page's accent was Volt lime, #b6ff1f, with dark olive grounds, at Werner's request;
+   he undid it the same day: "undo the lime yellow accent color on the black". --acc and --on-stop, which carried it,
+   stay as the accent's tokens) */
 :root[data-theme="dark"]{
   --paper:#100e14; --card:#1a1820; --ink:#f1f0f3; --grey:#9c97a8; --faint:#4a4655; --line:#2d2a35;
   --mat:#221f2a; --lav:#231c40; --night:#09080c; --on-ink:#121016; --sh:0,0,0; color-scheme:dark;
@@ -44,7 +48,7 @@ h1,h2,h3,p,figure,dl,dd,ul,ol{margin:0;padding:0} h1,h2,h3{font-size:inherit;fon
 ul,ol{list-style:none} img{display:block;max-width:100%} a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 :focus-visible{outline:2px solid var(--stop);outline-offset:3px}
-::selection{background:var(--stop);color:#fff}
+::selection{background:var(--stop);color:var(--on-stop)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .skip{position:absolute;left:var(--m);top:-100px;z-index:50;padding:8px 12px;background:var(--ink);color:var(--on-ink);border-radius:8px}
 .skip:focus{top:8px}
@@ -68,7 +72,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .pill{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 8px 0 18px;border-radius:999px;background:var(--ink);color:var(--on-ink);font-weight:500;font-size:.9375rem;transition:background .25s var(--out),color .25s var(--out)}
 .pill .arr{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--on-ink);color:var(--ink);transition:transform .35s var(--out)}
 .pill svg,.go svg{width:14px;height:14px}
-.pill:hover{background:var(--stop);color:#fff} .pill:hover .arr{transform:rotate(45deg)}
+.pill:hover{background:var(--stop);color:var(--on-stop)} .pill:hover .arr{transform:rotate(45deg)}
 .go{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);transition:background .25s var(--out),color .25s var(--out),border-color .25s var(--out)}
 .ln{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:var(--faint)}
 .ln:hover{text-decoration-color:currentColor}
@@ -91,6 +95,10 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .mode[aria-pressed="true"] svg{transform:rotate(180deg)}
 .nav .mode{margin-left:-8px}                                                 /* closer to the links than the nav's gap: it belongs with them */
 @media (max-width:760px){ .nav .links a.opt,.brand .sur{display:none} .nav{padding-left:16px;gap:12px} .nav .links a{padding-inline:9px} .nav .mode{margin-left:-4px} }
+/* the narrower phones (360px, many Androids; 320px, the small iPhones): with the light and dark button the CV pill ran
+   past the screen's edge, 42px at 320 (2026-11-15). Below 375px About goes from the nav (it is one scroll down) and the
+   gaps close a little */
+@media (max-width:374px){ .nav .links a[href$="#about"]{display:none} .nav{gap:8px} .nav .mode{margin-left:0} }
 /* the switch itself (js/contrast.js): the hero's wave. The new colours arrive square by square on the hero's grid,
    from the button outwards, and a band of lit squares runs with the front and fades behind it (.tw, a canvas over the
    page that the transition shows live). Nothing else moves on its own during it (the covers' names belong to the
@@ -161,7 +169,7 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 @media (max-width:519px){ .card .tags li:nth-child(n+4){display:none} }   /* 2026-11-15 (Werner: the cards too big on a phone): there, a card shows its first three tags; the case page has them all */
 @media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags:not(.few){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:0} .card .tags:not(.few) li:nth-child(n+4){padding-left:clamp(16px,2vw,28px)} }   /* 2026-11-15 (Werner): the rules run on across the two columns; the space between them is now the second column's own */
 .card .foot-row{display:flex;align-items:center;justify-content:space-between}
-.card:hover .go{background:var(--stop);border-color:var(--stop);color:#fff}
+.card:hover .go{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .panel{position:relative;display:flex;flex-direction:column;min-height:300px;padding:clamp(16px,2vw,28px);background:var(--tint,var(--mat))}
 .panel.night{background:var(--night);color:#fff}
 /* 2026-11-14: a card's picture sits on its flat ground. It had the page's grid behind it for a while (Werner, then: "add
@@ -195,7 +203,7 @@ html.lb-open{overflow:hidden}
 .lb img.pad{padding:clamp(16px,3vw,48px);border-radius:var(--r)}
 .lb figcaption{color:rgba(255,255,255,.62);white-space:pre;text-align:center}
 .lb button{position:absolute;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.28);color:#fff;background:rgba(18,16,22,.5);cursor:pointer;transition:background .25s var(--out),border-color .25s var(--out)}
-.lb button:hover{background:var(--stop);border-color:var(--stop)}
+.lb button:hover{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .lb button svg{width:18px;height:18px}
 .lb .lb-x{top:clamp(12px,1.6vw,20px);right:clamp(12px,1.6vw,20px)}
 .lb .lb-p,.lb .lb-n{top:50%;margin-top:-22px}
@@ -220,7 +228,7 @@ html.lb-open{overflow:hidden}
    around them. It is all a card shows: no caption, no stepping. It arrives from below, tipped back, and settles
    when the card comes into view (.in, js) */
 .frame.f-cover img{border-radius:0;box-shadow:none;filter:drop-shadow(0 26px 28px rgba(var(--sh),.2))}
-.panel.night .frame.f-cover img{filter:drop-shadow(0 24px 44px rgba(124,107,255,.3))}
+.panel.night .frame.f-cover img{filter:drop-shadow(0 24px 44px rgba(var(--acc),.3))}
 @media (prefers-reduced-motion:no-preference){
   .js .frame.f-cover:not(.in){opacity:0}
   .js .frame.f-cover img{transform:perspective(1400px) translateY(13%) rotateX(16deg) rotateZ(-2.5deg) scale(.88);transition:transform 1.4s cubic-bezier(.2,.75,.2,1),opacity .3s}   /* a softer curve than --out, which is over in a blink */
@@ -251,7 +259,7 @@ html.lb-open{overflow:hidden}
 /* 2026-11-14 (Werner: the portrait as on the CV, his pick there): the cut-out alone, standing on a rule with a soft
    violet light behind it. It was a violet tile. The rule is the one that closes the facts, carried on under him */
 .portrait{position:relative;width:min(300px,62vw);border-bottom:1px solid var(--line);overflow:hidden;
-  background:radial-gradient(ellipse 50% 44% at 50% 60%,rgba(124,107,255,.32),rgba(124,107,255,0) 100%)}
+  background:radial-gradient(ellipse 50% 44% at 50% 60%,rgba(var(--acc),.32),rgba(var(--acc),0) 100%)}
 .portrait::before{content:"";display:block;padding-top:100%}
 .portrait img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
 /* the grid behind him (Werner, later that day): the page's own squares, counted from the left margin and up from the
@@ -266,6 +274,14 @@ html.lb-open{overflow:hidden}
 .say{font-size:clamp(1.8rem,8vw,4.5rem);line-height:1.02;font-weight:400;letter-spacing:-.04em;text-wrap:balance}   /* below 900px (the desktop rule below sets its own): three balanced lines, set to fill the width (Werner, 2026-11-15: "fill out text") */
 @media (max-width:899px){ .about>.portrait{justify-self:center} }
 @media (min-width:600px) and (max-width:899px){ .say{font-size:5.3vw} }   /* two lines from 600px, filling the width; on a phone it would be hardly bigger than the bio, so there it stays three lines */                          /* and the portrait in the middle of the page */
+/* 2026-11-15 (Werner, a screenshot at about 720px: "people's could still fit on the first line to fill out the text more
+   on the full width"). Set in Funnel Display the statement had grown a line at both sizes above (four on a phone, three
+   from 600px), and balanced lines then filled only about 70% of the width. Now its size is a share of the width it has
+   (cqw: the About section's content width), so the lines break the same way at every width and fill it: three lines of
+   about 96% on a phone, two from 600px (96% and 89%: "Build something real, put it in people's hands," over "and let
+   them show you what to build next."). The shares were measured: 7.75% and 5% are the largest that keep three and two */
+@media (max-width:599px){ .about>.say{font-size:calc(100cqw * .0765)} }
+@media (min-width:600px) and (max-width:899px){ .about>.say{font-size:calc(100cqw * .0495)} }
 [data-fill] .w{color:var(--faint);transition:color .35s}
 [data-fill] .w.on{color:var(--ink)}
 .bio{margin-top:clamp(8px,1vw,22px);font-size:clamp(1.125rem,2.7vw,1.625rem);line-height:1.42;text-wrap:pretty}   /* below 900px: the whole width, a size up from the desktop's (the desktop rule below sets its own size and width) */
@@ -294,7 +310,7 @@ html.lb-open{overflow:hidden}
   .about>.portrait{grid-column:1;grid-row:2 / span 2;width:auto}
   .about>.say{grid-column:2 / span 2;grid-row:2;align-self:end;margin:0;padding-bottom:var(--c);font-size:clamp(1.75rem,3.75vw,6.25rem)}   /* 2026-11-15 (Werner): the statement runs over the bio's column and the facts'; first set large on three lines, then ("change the about headline to 2 lines, and reduce the font size to fill out 2 lines") on two balanced lines, the size at which they fill the two columns (the text is about 33 times the font size wide) */
   .about>.bio{grid-column:2;grid-row:3;margin:0;font-size:clamp(1.0625rem,1.3vw,1.1875rem);display:flex;flex-direction:column;justify-content:center;min-height:calc(var(--n,5) * var(--c));padding-block:calc(var(--c) * .28);border-block:1px solid var(--line)}
-  .about>.facts{grid-column:3;grid-row:3;margin:0;display:grid;grid-template-rows:repeat(4,minmax(var(--c),1fr))}   /* as tall as the bio's box (the row), so their rules meet at the top as well as at the foot; each fact at least a square */
+  .about>.facts{grid-column:3;grid-row:3;margin:0;display:grid;grid-auto-rows:minmax(var(--c),1fr)}   /* as tall as the bio's box (the row), so their rules meet at the top as well as at the foot; each fact at least a square. Five since 2026-11-15 (Leading design): on a laptop the bio's box is five squares, so each fact is one */
   .facts>div{align-items:center;padding-block:0}
   /* 2026-11-15 (Werner: "extend the line, remove the gap between these 2 columns"): the bio's box reaches over the gap
      to the facts, its text keeping its own width, so its top and foot rules run on into the facts' as one line each */
@@ -307,7 +323,7 @@ html.lb-open{overflow:hidden}
 }
 /* a narrower facts column (under about 250px: below 1000px): the label above its value, which then has the whole column */
 @media (min-width:900px) and (max-width:999px){
-  .about>.facts{grid-template-rows:repeat(4,minmax(calc(var(--c) * 2),1fr))}
+  .about>.facts{grid-auto-rows:minmax(calc(var(--c) * 2),1fr)}
   .facts>div{flex-direction:column;justify-content:center;gap:2px;align-items:flex-start}
   .facts dd{text-align:left}
 }
@@ -320,7 +336,7 @@ html.lb-open{overflow:hidden}
    dark, so the logos are ink and the grid's lines violet. */
 .strip{container-type:inline-size;border-radius:var(--r);background:var(--lav);overflow:hidden}
 .marq{--c:3.125cqw;position:relative;display:grid;align-items:center;height:calc(var(--c) * 4);
-  background:repeating-linear-gradient(180deg,rgba(124,107,255,.24) -1px,rgba(124,107,255,.24) 0px,transparent 0px,transparent calc(var(--c) - 1px)),repeating-linear-gradient(90deg,rgba(124,107,255,.24) -1px,rgba(124,107,255,.24) 0px,transparent 0px,transparent calc(var(--c) - 1px))}   /* one repeating gradient, not a tile (2026-11-15): Safari rounds a tile, see css/heroes-c.css */
+  background:repeating-linear-gradient(180deg,rgba(var(--acc),.24) -1px,rgba(var(--acc),.24) 0px,transparent 0px,transparent calc(var(--c) - 1px)),repeating-linear-gradient(90deg,rgba(var(--acc),.24) -1px,rgba(var(--acc),.24) 0px,transparent 0px,transparent calc(var(--c) - 1px))}   /* one repeating gradient, not a tile (2026-11-15): Safari rounds a tile, see css/heroes-c.css */
 @media (max-width:760px){ .marq{--c:6.25cqw} }
 @supports (width:round(nearest,1px,1px)){ .marq{height:round(nearest,170px,var(--c))} }
 .belt{overflow:hidden}
@@ -348,7 +364,7 @@ html.lb-open{overflow:hidden}
 .svc .tog{grid-column:2;grid-row:1 / span 3;position:relative;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--ink);transition:background .25s var(--out),border-color .25s var(--out),color .25s var(--out),transform .5s var(--out)}
 .svc .tog i{position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px -7px;border-radius:1px;background:currentColor;transition:transform .5s var(--out)}
 .svc .tog i:last-child{transform:rotate(90deg)}
-.svc .head:hover .tog,.svc>li.is-open .tog{background:var(--stop);border-color:var(--stop);color:#fff}
+.svc .head:hover .tog,.svc>li.is-open .tog{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .svc>li.is-open .tog i:last-child{transform:none}
 html:not(.js) .svc .tog{display:none}
 .svc .more{display:grid;grid-template-rows:1fr}
@@ -448,7 +464,7 @@ html:not(.js) .svc .tog{display:none}
 .back{display:inline-flex;align-items:center;gap:12px;color:var(--ink)}
 .back .go{width:40px;height:40px}
 .back .go svg{transition:transform .3s var(--out)}
-.back:hover .go{background:var(--stop);border-color:var(--stop);color:#fff}
+.back:hover .go{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .back:hover .go svg{transform:translateX(-2px)}
 @media (max-width:520px){ .ctop .crumb{display:none} }                   /* a phone: the button alone; the nav has Work */
 /* the cover, under the headline: the card's panel, larger, on its own */
@@ -517,7 +533,7 @@ html:not(.js) .svc .tog{display:none}
 .nextp .row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:20px}
 .nextp .row .go{margin-left:auto}                                            /* where the name and the arrow do not fit side by side (a long name on a phone), the arrow takes the next line, still at the right */
 .nextp .go{border-color:rgba(255,255,255,.3);width:64px;height:64px} .nextp .go svg{width:20px;height:20px}
-.nextp:hover .go{background:var(--stop);border-color:var(--stop)}
+.nextp:hover .go{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 
 /* ── motion: everything below only runs with scripts on and motion allowed ─ */
 @media (prefers-reduced-motion:no-preference){
@@ -565,3 +581,4 @@ html:not(.js) .svc .tog{display:none}
 /* the font switch's pill (build.mjs, FONT_SWITCH: exploring only, not in the deployed site) */
 .fontpill{position:fixed;left:12px;bottom:12px;z-index:60;display:flex;gap:12px;align-items:center;padding:8px 14px;border-radius:999px;background:var(--night);color:rgba(255,255,255,.8)}
 .fontpill a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.accpill{left:auto;right:12px}                                            /* the accent switch's pill (build.mjs, ACCENT_SWITCH), at the other corner */

@@ -4,6 +4,14 @@
 .cx .body{position:relative;display:grid;grid-template-rows:1fr auto auto;isolation:isolate}
 .cx .bg{position:absolute;inset:0 calc(-1 * var(--m));z-index:-1;overflow:hidden;pointer-events:none}
 .cx h1{align-self:center;font-size:clamp(3.7rem,10.6vw,10rem)}
+/* 2026-11-15 (Werner: "make the Zero to shipped text flex width that scales with the screen width"): the homepage's
+   headline is sized in the grid's own squares, so it grows and shrinks with the width at every size. It was held
+   between 3.7rem and 10rem, so it stopped growing above about 1510px and did not change at all on a phone. Its full
+   stop now lands on the same line of the grid at any width: the 14th from the margin, where it sat on a laptop (the
+   10th on a phone), so js/heroes.js only nudges it by a hair. A low window still caps it (the 100svh term), so the
+   sentence and the timeline stay in view under it. A phone held sideways keeps its own rule below */
+.cx-1 h1{font-size:min(calc(var(--c) * 3.89),calc((100svh - 420px) / 1.76))}
+@media (max-width:760px){ .cx-1 h1{font-size:calc(var(--c) * 2.78)} }
 .cx .under{display:grid;gap:14px var(--g);padding-top:22px;align-items:end}
 @media (min-width:900px){ .cx .under{grid-template-columns:7fr 5fr} .cx .under .mono{text-align:right} }
 .cx .roll>span{transform:translateY(-80%)}                              /* five slots, the first one empty: at rest it shows the last */
@@ -67,7 +75,7 @@
 .cx-1 .grid .pin.wink{opacity:0;transform:none;transition:opacity 3.2s ease-in-out}
 .cx-1 .grid .pin.wink.up{opacity:.6}
 @media (prefers-reduced-motion:no-preference){ .js .cx-1 .grid>.pin:not(.wink){display:none} }
-.cx-1 .lit{position:absolute;width:var(--c);height:var(--c);background:rgba(124,107,255,.2);box-shadow:0 0 30px 8px rgba(124,107,255,.42),inset 0 0 0 1px rgba(124,107,255,.6);animation:lit 1.3s ease-out forwards}
+.cx-1 .lit{position:absolute;width:var(--c);height:var(--c);background:rgba(var(--acc),.2);box-shadow:0 0 30px 8px rgba(var(--acc),.42),inset 0 0 0 1px rgba(var(--acc),.6);animation:lit 1.3s ease-out forwards}
 @keyframes lit{from{opacity:1}to{opacity:0}}
 .cx.on .pin{transform:none}
 /* the portrait (2026-11-14, Werner): on the right, standing on the timeline and centred on the Tested tick. It is an
@@ -95,13 +103,13 @@
 .js .cx-1 .who img{opacity:0}
 .cx-1 .who .px{position:absolute;left:calc(var(--c) * var(--x));top:calc(var(--c) * var(--y));width:var(--c);height:var(--c);opacity:0;
   background-color:var(--lav);background-repeat:no-repeat;
-  background-image:linear-gradient(rgba(124,107,255,.1),rgba(124,107,255,.1)),var(--img);
+  background-image:linear-gradient(rgba(var(--acc),.1),rgba(var(--acc),.1)),var(--img);
   background-size:auto,calc(var(--c) * var(--n)) calc(var(--c) * var(--n));
   background-position:0 0,calc(var(--c) * var(--x) * -1) calc(var(--c) * var(--y) * -1);
-  box-shadow:inset 0 0 0 .5px rgba(124,107,255,.34);transition:opacity 1.4s ease-out}
+  box-shadow:inset 0 0 0 .5px rgba(var(--acc),.34);transition:opacity 1.4s ease-out}
 .cx-1 .who .px.on{opacity:var(--o,1);transition-duration:.16s}
 .cx-1 .who .halo{position:absolute;left:0;top:0;width:calc(var(--c) * 12);height:calc(var(--c) * 12);margin:calc(var(--c) * -6);border-radius:50%;
-  background:radial-gradient(closest-side,rgba(124,107,255,.36),rgba(124,107,255,.12) 60%,rgba(124,107,255,0));opacity:0;transform:translate(var(--hx,0),var(--hy,0));transition:opacity .6s ease-out}
+  background:radial-gradient(closest-side,rgba(var(--acc),.36),rgba(var(--acc),.12) 60%,rgba(var(--acc),0));opacity:0;transform:translate(var(--hx,0),var(--hy,0));transition:opacity .6s ease-out}
 .cx-1 .who.near .halo{opacity:1;transition-duration:.25s}
 @media (prefers-reduced-motion:reduce){ .js .cx-1 .who img{opacity:1} }
 /* the wave that runs over the grid when the dot lands (js/heroes.js): one canvas over the hero, behind the type */
@@ -110,7 +118,7 @@
 /* 2 · dots and light */
 .cx-2 .bg{background:radial-gradient(circle at 1.5px 1.5px,var(--faint) 1.3px,transparent 1.8px) 0 0 / 22px 22px;
   -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 30%,#000 100%);mask-image:linear-gradient(180deg,transparent 0,#000 30%,#000 100%)}
-.cx-2 .glow{display:block;position:absolute;top:0;left:calc(100% - var(--m));z-index:-1;width:640px;height:640px;margin:-320px;border-radius:50%;background:radial-gradient(closest-side,rgba(124,107,255,.42),rgba(124,107,255,.14) 55%,rgba(124,107,255,0))}
+.cx-2 .glow{display:block;position:absolute;top:0;left:calc(100% - var(--m));z-index:-1;width:640px;height:640px;margin:-320px;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--acc),.42),rgba(var(--acc),.14) 55%,rgba(var(--acc),0))}
 
 /* 3 · fluted violet */
 .cx-3 .body,.cx-5 .body{--m:clamp(18px,2.8vw,44px);padding:clamp(18px,2.8vw,44px) var(--m) var(--m);color:#fff;--ink:#fff;--grey:rgba(255,255,255,.74);--faint:rgba(255,255,255,.42);--line:rgba(255,255,255,.3)}
@@ -127,7 +135,7 @@
 
 /* 5 · ink columns */
 .cx-5 .bg{background:var(--night);--w:calc(100% - 2 * var(--m))}
-.cx-5 .col{position:absolute;top:0;bottom:0;left:calc(var(--m) + var(--w) * .25 * var(--k));width:calc(var(--w) * .25);border-left:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(124,107,255,0) 20%,rgba(124,107,255,.3) 100%)}
+.cx-5 .col{position:absolute;top:0;bottom:0;left:calc(var(--m) + var(--w) * .25 * var(--k));width:calc(var(--w) * .25);border-left:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(var(--acc),0) 20%,rgba(var(--acc),.3) 100%)}
 .cx-5 .col:last-child{border-right:1px solid rgba(255,255,255,.1)}
 
 /* ── the timeline ───────────────────────────────────────────────────────────

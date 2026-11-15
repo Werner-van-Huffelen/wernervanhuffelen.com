@@ -160,7 +160,8 @@
       [[0, 0], [W, 0], [0, H], [W, H]].forEach(function (p) { far = Math.max(far, Math.sqrt((p[0] - ox) * (p[0] - ox) + (p[1] - oy) * (p[1] - oy))); });
       var cols = Math.round((W - 2 * x0) / c), j0 = -Math.ceil(yl / c), j1 = Math.ceil((H - yl) / c);
       var mx = 0.56 * W, mrx = 0.74 * W, mry = 720;                         /* the grid's own fade (css/heroes-c.css): the wave fades with it */
-      var lav = getComputedStyle(d.documentElement).getPropertyValue('--lav').trim() || '#e2dcff';   /* the portrait's ground: light purple, or deep violet on the dark page */
+      var rs = getComputedStyle(d.documentElement), lav = rs.getPropertyValue('--lav').trim() || '#e2dcff';   /* the portrait's ground: light purple, or dark olive on the dark page */
+      var acc = rs.getPropertyValue('--acc').trim() || '124,107,255', A = function (a) { return 'rgba(' + acc + ',' + a + ')'; };   /* the accent: violet, or lime on the dark page */
       var drop = function () { if (cv.parentNode) cv.parentNode.removeChild(cv); };
       if (k) {                                                             /* the picture at the size it is shown: a square of it is then nat by nat (an <img>'s own size depends on its srcset) */
         src = d.createElement('canvas'); src.width = src.height = Math.round(k * c * dpr); nat = src.width / k;
@@ -177,7 +178,7 @@
         cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.globalAlpha = 1; cx.clearRect(0, 0, W, H);
         /* a soft light under the squares, where the wave is */
         g = cx.createRadialGradient(ox, oy, Math.max(0, R - B), ox, oy, R + c);
-        g.addColorStop(0, 'rgba(124,107,255,0)'); g.addColorStop(0.74, 'rgba(124,107,255,.2)'); g.addColorStop(1, 'rgba(124,107,255,0)');
+        g.addColorStop(0, A('0')); g.addColorStop(0.74, A('.2')); g.addColorStop(1, A('0'));
         cx.fillStyle = g; cx.fillRect(0, 0, W, H);
         cx.save(); cx.globalCompositeOperation = 'destination-in'; cx.translate(mx, yl); cx.scale(mrx, mry);
         g = cx.createRadialGradient(0, 0, 0.3, 0, 0, 1); g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -196,8 +197,8 @@
             cx.globalAlpha = al;
             cx.fillStyle = lav; cx.fillRect(x, y, c, c);
             cx.drawImage(src, px * nat, py * nat, nat, nat, x, y, c, c);
-            cx.fillStyle = 'rgba(124,107,255,.1)'; cx.fillRect(x, y, c, c);
-            cx.strokeStyle = 'rgba(124,107,255,.34)'; cx.lineWidth = 0.5; cx.strokeRect(x + 0.25, y + 0.25, c - 0.5, c - 0.5); cx.lineWidth = 1;
+            cx.fillStyle = A('.1'); cx.fillRect(x, y, c, c);
+            cx.strokeStyle = A('.34'); cx.lineWidth = 0.5; cx.strokeRect(x + 0.25, y + 0.25, c - 0.5, c - 0.5); cx.lineWidth = 1;
           } else {                                                                         /* a square of the grid: as lit by the pointer */
             u = (R - dist) / B;
             if (u >= 1) continue;
@@ -206,8 +207,8 @@
             al *= r <= 0.3 ? 1 : 1 - (r - 0.3) / 0.7;
             if (al < 0.02) continue;
             cx.globalAlpha = al;
-            cx.fillStyle = 'rgba(124,107,255,.2)'; cx.fillRect(x, y, c, c);
-            cx.strokeStyle = 'rgba(124,107,255,.6)'; cx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1);
+            cx.fillStyle = A('.2'); cx.fillRect(x, y, c, c);
+            cx.strokeStyle = A('.6'); cx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1);
           }
         }
         requestAnimationFrame(step);

@@ -83,14 +83,14 @@
       var cx = cv.getContext && cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2);
       cv.className = 'tw'; cv.setAttribute('aria-hidden', 'true');
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + 'px'; cv.style.height = H + 'px';
-      var t0 = 0, drop = function () { if (cv.parentNode) cv.parentNode.removeChild(cv); };
+      var t0 = 0, drop = function () { if (cv.parentNode) cv.parentNode.removeChild(cv); }, acc = '', A = function (a) { return 'rgba(' + acc + ',' + a + ')'; };
       var draw = function (now) {
         if (me !== wave || !cx) { drop(); return; }
-        if (!t0) t0 = now;
+        if (!t0) { t0 = now; acc = getComputedStyle(r).getPropertyValue('--acc').trim() || '124,107,255'; }   /* the new colours' accent: lime into dark, violet into light */
         var t = Math.min(1, (now - t0) / DUR), R = ease(t) * end, i, j, x, y, dist, u, al, g;
         cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.globalAlpha = 1; cx.clearRect(0, 0, W, H);
         g = cx.createRadialGradient(ox, oy, Math.max(0, R - B), ox, oy, R + c);
-        g.addColorStop(0, 'rgba(124,107,255,0)'); g.addColorStop(0.74, 'rgba(124,107,255,.16)'); g.addColorStop(1, 'rgba(124,107,255,0)');
+        g.addColorStop(0, A('0')); g.addColorStop(0.74, A('.16')); g.addColorStop(1, A('0'));
         cx.fillStyle = g; cx.fillRect(0, 0, W, H);
         for (j = j0; j <= j1; j++) for (i = i0; i <= i1; i++) {
           x = L.x0 + i * c; y = L.y0 + j * c;
@@ -99,8 +99,8 @@
           if (u <= 0 || u >= 1) continue;
           al = u < 0.12 ? u / 0.12 : Math.pow(1 - (u - 0.12) / 0.88, 1.6);
           cx.globalAlpha = al;
-          cx.fillStyle = 'rgba(124,107,255,.2)'; cx.fillRect(x, y, c, c);
-          cx.strokeStyle = 'rgba(124,107,255,.6)'; cx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1);
+          cx.fillStyle = A('.2'); cx.fillRect(x, y, c, c);
+          cx.strokeStyle = A('.6'); cx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1);
         }
         if (t < 1) requestAnimationFrame(draw); else drop();
       };
