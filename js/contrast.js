@@ -220,6 +220,39 @@
     var done = function () { img.classList.remove('is-loading'); };
     img.classList.add('is-loading'); img.addEventListener('load', done); img.addEventListener('error', done);
   });
+  /* a case page's title fills the width (2026-11-15, Werner, a screenshot of GALVANY's: "the header text should fill
+     the width of the screen"). It was held to 14.5em and balanced, so its lines filled about 70% of the width. Now it
+     keeps as many lines as it takes at the size the css gives it, and grows until they fill the width: the size the
+     whole line of text would need, spread over that many lines, then a step smaller while it still needs one more.
+     The titles differ in length, so each lands at its own size (about 100 to 115px on a 1440px screen); on a phone
+     they stay about as they were. Without scripts it is the css size, across the whole width */
+  $('.chero .lead').forEach(function (h) {
+    var ws = $('.w', h), queued = false;
+    if (!ws.length) return;
+    var lines = function () { var t = {}; ws.forEach(function (w) { t[w.offsetTop] = (t[w.offsetTop] || 0) + 1; }); return t; };
+    var rows = function () { return Object.keys(lines()).length; };
+    function fit() {
+      queued = false;
+      h.style.fontSize = ''; h.style.textWrap = '';
+      var cw = h.clientWidth;
+      if (!(cw > 0)) return;
+      /* measured at a size that is a share of the width (on a phone a larger one), so a title's length in widths, and
+         with it its line count and its breaks, is the same at every width; it does not flip as the window changes */
+      var f0 = cw * (innerWidth < 600 ? 0.112 : 0.07);
+      h.style.fontSize = f0.toFixed(2) + 'px';
+      h.style.whiteSpace = 'nowrap'; var x = h.scrollWidth / cw; h.style.whiteSpace = '';   /* the title's length, in widths */
+      var lo = Math.floor(x), n = lo >= 1 && x / lo <= 1.12 ? lo : lo + 1;                      /* just over a whole number of lines: that many, a little smaller; otherwise one more, larger */
+      var f = f0 * n / x * 0.985;
+      h.style.fontSize = f.toFixed(2) + 'px';
+      for (var k = 0; k < 24 && rows() > n; k++) { f *= 0.985; h.style.fontSize = f.toFixed(2) + 'px'; }
+      var t = lines(), last = Math.max.apply(null, Object.keys(t).map(Number));
+      if (n > 1 && t[last] === 1) h.style.textWrap = 'pretty';                               /* not one word alone on the last line */
+    }
+    var later = function () { if (!queued) { queued = true; requestAnimationFrame(fit); } };
+    fit(); addEventListener('resize', later);
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(fit);
+  });
+
   /* a case page's back button (2026-11-15): opened from the homepage, it goes back in the history, so the homepage is
      where it was left; otherwise (a link from outside, or from another case) it follows its link to the case's card */
   $('.back').forEach(function (a) {

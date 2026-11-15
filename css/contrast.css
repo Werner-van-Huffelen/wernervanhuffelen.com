@@ -474,6 +474,7 @@ html:not(.js) .svc .tog{display:none}
 @media (min-width:761px){ .ccover .mat{aspect-ratio:2 / 1} }
 .ccover + .spread{margin-top:var(--g)}                                    /* the screens follow at the same gap they keep among themselves (Werner, 2026-11-15) */
 .lead{font-size:clamp(2.5rem,6.2vw,5.75rem);line-height:.94;max-width:14.5em}
+.chero .lead{max-width:none;font-size:clamp(2.5rem,6.2vw,10rem);text-wrap:wrap}   /* a case page's title fills the width (js/contrast.js fits its size, 2026-11-15): its lines run to the edge (not balanced; js turns on pretty only if a word would stand alone on the last line), and its starting size keeps growing on a wide screen, so a title keeps its number of lines at every desktop width */
 .spread{display:grid;gap:var(--g);margin-top:clamp(36px,4.6vw,72px)}
 .spread .side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--g)}
 .spread .side:has(>:only-child){grid-template-columns:minmax(0,1fr)}
@@ -502,11 +503,12 @@ html:not(.js) .svc .tog{display:none}
   .cells>div:nth-child(n+3){border-top:1px solid var(--line)}
   .cells .pin{display:none}
 }
-@media (min-width:761px){ .cells{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@media (min-width:761px){ .cells{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)} }   /* one equal column per fact, so they spread over the whole width (2026-11-15, Werner: "spread these evenly on the width of the page, for all these strips, except mobile"); it was four columns, which left a quarter empty where a case has three facts */
 .told{row-gap:10px;padding-top:clamp(56px,7vw,112px)}
 .told>*{grid-column:1 / -1}
 .told p{font-size:clamp(1.375rem,2.5vw,2.25rem);line-height:1.14;letter-spacing:-.03em;max-width:25em;text-wrap:pretty}
-@media (min-width:900px){ .told>.lab{grid-column:1 / span 4;padding-top:.7em} .told>p,.told>.con,.told>.ctags{grid-column:5 / span 8} }
+.told p+p{margin-top:.55em}                                               /* a second paragraph (GALVANY's brief, 2026-11-15) */
+@media (min-width:600px){ .told>.lab{grid-column:1 / span 4;padding-top:.7em;align-self:start} .told>p,.told>.con,.told>.ctags{grid-column:5 / span 8} }   /* the label beside its text from a tablet up (2026-11-15, Werner: "on the tablet breakpoint the title and body text should be two columns like on the desktop"); it began at 900px */
 /* a case page's skills (2026-11-15, Werner: "add the tags on the case study pages"): the card's tags, in two columns (three
    from 900px), the rules running on across them as on the cards */
 .ctags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-bottom:1px solid var(--line)}

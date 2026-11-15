@@ -294,12 +294,14 @@
       for (var n = 0; n < N; n++) run(1400 + n * 1700 + Math.random() * 900);       /* they start one after another, over the first seconds */
     })();
 
-    /* The full stop of the headline's last word ("shipped.") sits on a crossing of the grid (2026-11-15, Werner: "align
-       the title so the purple dot on the headline always sits on the quadrant intersection"). Across, the headline's
-       size is nudged (the dot moves at most half a square, a few per cent of the size) so the dot meets a vertical
-       line while the headline keeps its left edge; down, the headline and the sentence move together by at most half
-       a square. Measured where the word comes to rest, whatever the roll is doing at the time, and again when the
-       font has arrived or the window changes. */
+    /* The full stop of the headline's last word ("shipped.") sits on a line of the grid (2026-11-15, Werner: "align
+       the title so the purple dot on the headline always sits on the quadrant intersection"). Until later that day it
+       met a crossing: across, the headline's size was nudged so the dot met a vertical line. Then Werner set the sizes
+       ("scale gradually", 40 to 120px, the text two squares above the timeline), and a nudged size jumps as the window
+       widens, so now only the horizontal line: the headline alone is lifted, by less than a square, to the line at or
+       above the dot, and the sentence keeps its two squares above the timeline (css/heroes-c.css). Measured where the
+       word comes to rest, whatever the roll is doing at the time, and again when the font has arrived or the window
+       changes. */
     var h1 = sec.querySelector('h1'), leadIn = sec.querySelector('.lead-in'), inner = sec.querySelector('.roll > span'), last = sec.querySelector('.roll > span > span:last-child > .stop');
     function restOf() {                                                    /* the dot's middle, with the word at rest */
       var b = last.getBoundingClientRect(), ty = 0;
@@ -308,17 +310,11 @@
     }
     function snap() {
       if (!h1 || !leadIn || !inner || !last) return;
-      h1.style.fontSize = ''; leadIn.style.transform = '';
+      h1.style.fontSize = ''; h1.style.translate = ''; leadIn.style.transform = '';
       var s = size(); if (!s.c) return;
-      var x0 = s.r.left + s.m, y0 = s.r.top + 1200, left = h1.getBoundingClientRect().left, p = restOf();
-      var tx = x0 + Math.round((p.x - x0) / s.c) * s.c + 0.5;            /* the nearest vertical line's middle */
-      for (var n = 0; n < 2 && p.x - left > 1; n++) {                       /* twice: type does not scale quite linearly */
-        h1.style.fontSize = (parseFloat(getComputedStyle(h1).fontSize) * (tx - left) / (p.x - left)).toFixed(3) + 'px';
-        p = restOf();
-      }
-      s = size(); y0 = s.r.top + 1200;                                      /* the new size can move the timeline, and the grid with it (a low window) */
-      var ty = y0 + Math.round((p.y - y0) / s.c) * s.c + 0.5;
-      leadIn.style.transform = 'translateY(' + (ty - p.y).toFixed(2) + 'px)';
+      var y0 = s.r.top + 1200, p = restOf();
+      var ty = y0 + Math.floor((p.y - y0) / s.c) * s.c + 0.5;              /* the line at or above the dot: the headline only rises, away from the sentence */
+      h1.style.translate = '0 ' + (ty - p.y).toFixed(2) + 'px';
     }
     snap();
     if (d.fonts && d.fonts.ready) d.fonts.ready.then(snap);

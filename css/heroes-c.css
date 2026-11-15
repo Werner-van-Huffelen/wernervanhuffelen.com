@@ -4,14 +4,9 @@
 .cx .body{position:relative;display:grid;grid-template-rows:1fr auto auto;isolation:isolate}
 .cx .bg{position:absolute;inset:0 calc(-1 * var(--m));z-index:-1;overflow:hidden;pointer-events:none}
 .cx h1{align-self:center;font-size:clamp(3.7rem,10.6vw,10rem)}
-/* 2026-11-15 (Werner: "make the Zero to shipped text flex width that scales with the screen width"): the homepage's
-   headline is sized in the grid's own squares, so it grows and shrinks with the width at every size. It was held
-   between 3.7rem and 10rem, so it stopped growing above about 1510px and did not change at all on a phone. Its full
-   stop now lands on the same line of the grid at any width: the 14th from the margin, where it sat on a laptop (the
-   10th on a phone), so js/heroes.js only nudges it by a hair. A low window still caps it (the 100svh term), so the
-   sentence and the timeline stay in view under it. A phone held sideways keeps its own rule below */
-.cx-1 h1{font-size:min(calc(var(--c) * 3.89),calc((100svh - 420px) / 1.76))}
-@media (max-width:760px){ .cx-1 h1{font-size:min(calc(var(--c) * 2.78),87.6px)} }   /* the phone's 16 squares: up to 87.6px, the size the 32 squares give at 761px, so the headline never shrinks where the grid changes (uncapped it reached 120px at 720 and dropped to 88 at 761). From about 545px it holds at that size, and js/heroes.js nudges its full stop onto a line */
+/* the homepage's headline, 2026-11-15, in three steps. First (Werner: "make the Zero to shipped text flex width that
+   scales with the screen width") it was sized in the grid's squares, its full stop on the same line at any width; then
+   ("too large ... make it 80px max") held to 80px. Its size now is the rule after the sideways phone's, below */
 .cx .under{display:grid;gap:14px var(--g);padding-top:22px;align-items:end}
 @media (min-width:900px){ .cx .under{grid-template-columns:7fr 5fr} .cx .under .mono{text-align:right} }
 .cx .roll>span{transform:translateY(-80%)}                              /* five slots, the first one empty: at rest it shows the last */
@@ -42,6 +37,18 @@
   .cx h1{font-size:clamp(2.5rem,min(10.6vw,calc((100svh - 150px) / 1.8)),10rem)}
   .cx .lead-in .lede{font-size:clamp(1.0625rem,2.2vw,1.3125rem);max-width:24em}
 }
+/* the homepage's headline and sentence (2026-11-15, Werner: "I want the header hero text to scale with the size of the
+   window, (min 40px/20px on mobile) and max 120px/40px on screen size larger than 1920px (and scale gradually between
+   those breakpoints). The distance between the text and the timeline should be 2 rectangles (of the grid)").
+   The headline runs evenly from 40px on a 320px phone to 120px at 1920px wide and holds there; the sentence from 20px to
+   40px over the same widths: 5vw + 24px and 1.25vw + 16px. A phone held sideways follows them too (they come after its
+   rules). The pair sits at the foot of the hero's free space, its last line exactly two squares above the timeline.
+   The full stop still meets a line of the grid, a horizontal one: js/heroes.js lifts the headline alone by less than a
+   square, which leaves the sentence and its two squares where they are. It no longer meets a vertical line as well:
+   that took nudging the size, which made it jump as the window widened instead of growing evenly */
+.cx-1 h1{font-size:clamp(40px,calc(5vw + 24px),120px)}
+.cx-1 .lead-in .lede{font-size:clamp(20px,calc(1.25vw + 16px),40px)}
+.cx-1 .lead-in{align-self:end;padding-bottom:calc(var(--c) * 2)}
 .cx .under{grid-template-columns:minmax(0,1fr);padding-top:18px}
 /* 2026-11-15 (Werner): the note under the timeline ("Getting sh*t done since 2015") moved to the Experience header.
    Its room stays (18px and two 11px lines): the timeline keeps its place 146px over the hero's foot, which the grid's
