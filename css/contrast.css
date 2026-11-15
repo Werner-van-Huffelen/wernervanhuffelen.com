@@ -193,6 +193,11 @@ html.lb-open{overflow:hidden}
   .js .frame.f-cover:not(.in){opacity:0}
   .js .frame.f-cover img{transform:perspective(1400px) translateY(13%) rotateX(16deg) rotateZ(-2.5deg) scale(.88);transition:transform 1.4s cubic-bezier(.2,.75,.2,1),opacity .3s}   /* a softer curve than --out, which is over in a blink */
   .js .frame.f-cover.is-on.in img{transform:none}
+  /* 2026-11-15 (Werner): on the cards without a laptop (Bandcamp, Affinidi), the cover grows a little under the pointer,
+     as the laptops' screens turn on the others. A mouse only */
+  @media (hover:hover) and (pointer:fine){
+    .card:hover .mat:not([data-screens]) .frame.f-cover.is-on.in img{transform:scale(1.1);transition:transform .8s cubic-bezier(.2,.75,.2,1),opacity .3s}
+  }
 }
 .cap{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:0 16px;min-height:26px;padding-top:10px}
 .panel.night .cap,.night .cap{color:rgba(255,255,255,.6)}
