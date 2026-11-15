@@ -157,6 +157,7 @@
       [[0, 0], [W, 0], [0, H], [W, H]].forEach(function (p) { far = Math.max(far, Math.sqrt((p[0] - ox) * (p[0] - ox) + (p[1] - oy) * (p[1] - oy))); });
       var cols = Math.round((W - 2 * x0) / c), j0 = -Math.ceil(yl / c), j1 = Math.ceil((H - yl) / c);
       var mx = 0.56 * W, mrx = 0.74 * W, mry = 720;                         /* the grid's own fade (css/heroes-c.css): the wave fades with it */
+      var lav = getComputedStyle(d.documentElement).getPropertyValue('--lav').trim() || '#e2dcff';   /* the portrait's ground: light purple, or deep violet on the dark page */
       var drop = function () { if (cv.parentNode) cv.parentNode.removeChild(cv); };
       if (k) {                                                             /* the picture at the size it is shown: a square of it is then nat by nat (an <img>'s own size depends on its srcset) */
         src = d.createElement('canvas'); src.width = src.height = Math.round(k * c * dpr); nat = src.width / k;
@@ -190,7 +191,7 @@
             if (u >= 1) continue;
             al = u < 0.08 ? u / 0.08 : u < 0.45 ? 1 : Math.pow(1 - (u - 0.45) / 0.55, 1.4);
             cx.globalAlpha = al;
-            cx.fillStyle = '#e2dcff'; cx.fillRect(x, y, c, c);
+            cx.fillStyle = lav; cx.fillRect(x, y, c, c);
             cx.drawImage(src, px * nat, py * nat, nat, nat, x, y, c, c);
             cx.fillStyle = 'rgba(124,107,255,.1)'; cx.fillRect(x, y, c, c);
             cx.strokeStyle = 'rgba(124,107,255,.34)'; cx.lineWidth = 0.5; cx.strokeRect(x + 0.25, y + 0.25, c - 0.5, c - 0.5); cx.lineWidth = 1;

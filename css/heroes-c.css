@@ -56,7 +56,7 @@
    row was cut straight across. A wash of the page's own colour lies over the grid's last 110px (from just under the
    tick labels to the edge), behind the type: the grid, its glow and the wave fade out before the edge */
 .cx-1 .body::after{content:"";position:absolute;z-index:-1;left:calc(-1 * var(--m));right:calc(-1 * var(--m));bottom:-30px;height:110px;pointer-events:none;
-  background:linear-gradient(180deg,rgba(241,240,243,0),rgba(241,240,243,.5) 35%,rgba(241,240,243,.86) 68%,var(--paper))}
+  background:linear-gradient(180deg,color-mix(in srgb,var(--paper) 0%,transparent),color-mix(in srgb,var(--paper) 50%,transparent) 35%,color-mix(in srgb,var(--paper) 86%,transparent) 68%,var(--paper))}   /* the paper's colour, light or dark (2026-11-15) */
 /* the pins that come and go (js/heroes.js): a dot at a crossing fades in over 3.2s to a low peak and out again. With motion
    allowed the two fixed pins above give way to them */
 .cx-1 .grid .pin.wink{opacity:0;transform:none;transition:opacity 3.2s ease-in-out}

@@ -18,6 +18,102 @@
 
   /* 2. (Berlin's time in the nav: taken out 2026-11-15, Werner: "feels a bit gimmicky") */
 
+  /* 2a. light and dark (2026-11-15, Werner: "create a dark mode version"). The page follows the system's setting until
+     the nav's button is pressed; the pick is kept for later visits (the script in the head applies it before the first
+     paint). Where the browser can, the switch is the hero's wave (Werner, later that day: "the ripple effect from the
+     hero when you switch"): the new colours arrive square by square on the hero's grid, from the button outwards,
+     with a band of lit squares at the front (css: html.theming, .tw). It was a plain circle at first */
+  (function () {
+    var btn = d.querySelector('.mode'), r = d.documentElement, mq = null;
+    if (!btn) return;
+    try { mq = matchMedia('(prefers-color-scheme: dark)'); } catch (e) { /* no system setting: light */ }
+    var dark = function () { var t = r.getAttribute('data-theme'); return t ? t === 'dark' : !!(mq && mq.matches); };
+    var sync = function () {
+      var on = dark();
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      $('meta[name="theme-color"]').forEach(function (m) { m.content = on ? '#100e14' : '#f1f0f3'; });
+    };
+    sync();
+    if (mq && mq.addEventListener) mq.addEventListener('change', sync);
+    /* the grid the wave runs on: the hero's own where there is one (its squares and lines, so the wave lands on them),
+       otherwise the same squares (1/32 of the width between the margins, 1/16 on a phone) from the left margin */
+    var lattice = function () {
+      var g = d.querySelector('.cx-1 .grid'), W = r.clientWidth, s, gr, m;
+      if (g) {
+        s = parseFloat(getComputedStyle(g).backgroundSize); gr = g.getBoundingClientRect(); m = parseFloat(getComputedStyle(g.closest('.cx-1')).paddingLeft);
+        if (s > 0) return { c: s, x0: gr.left + m, y0: gr.top + 1200 };
+      }
+      m = parseFloat(getComputedStyle(d.querySelector('.foot') || d.body).paddingLeft) || 16;
+      s = (W - 2 * m) / (W <= 760 ? 16 : 32);
+      return { c: s, x0: m, y0: -(scrollY % s) };
+    };
+    var DUR = 1150, DEEP = 6, wave = 0;                                     /* the switch's length (ms), and the lit band's depth in squares */
+    var ease = function (t) { return 1 - (1 - t) * (1 - t); };
+    btn.addEventListener('click', function () {
+      var to = dark() ? 'light' : 'dark', me = ++wave, cv = null;
+      var apply = function () {
+        r.setAttribute('data-theme', to); try { localStorage.setItem('theme', to); } catch (e) { /* not kept */ } sync();
+        if (cv) d.body.appendChild(cv);
+      };
+      if (reduce || !d.startViewTransition) { apply(); return; }
+      var L = lattice(), c = L.c, W = r.clientWidth, H = innerHeight, b = btn.getBoundingClientRect();
+      var ox = b.left + b.width / 2, oy = b.top + b.height / 2, B = DEEP * c;
+      var far = Math.sqrt(Math.pow(Math.max(ox, W - ox), 2) + Math.pow(Math.max(oy, H - oy), 2)) + c, end = far + B;
+      var i0 = Math.floor(-L.x0 / c) - 1, i1 = Math.ceil((W - L.x0) / c), j0 = Math.floor(-L.y0 / c) - 1, j1 = Math.ceil((H - L.y0) / c);
+      /* what has turned at reach R: on each row of squares, the run whose middles are within R of the button (one run a
+         row, as a circle crosses a row once), as a path of rectangles */
+      var turned = function (R) {
+        var p = '', j, y, dy, h, a, z;
+        for (j = j0; j <= j1; j++) {
+          y = L.y0 + j * c; dy = y + c / 2 - oy;
+          if (Math.abs(dy) >= R) continue;
+          h = Math.sqrt(R * R - dy * dy);
+          a = Math.ceil((ox - h - L.x0 - c / 2) / c); z = Math.floor((ox + h - L.x0 - c / 2) / c);
+          if (z < a) continue;
+          p += 'M' + (L.x0 + a * c).toFixed(1) + ' ' + y.toFixed(1) + 'h' + ((z - a + 1) * c).toFixed(1) + 'v' + c.toFixed(1) + 'h' + (-(z - a + 1) * c).toFixed(1) + 'Z';
+        }
+        return 'path("' + (p || 'M0 0Z') + '")';
+      };
+      var frames = [], n = Math.ceil(DUR / 16), k;
+      for (k = 0; k <= n; k++) frames.push({ offset: k / n, clipPath: turned(ease(k / n) * end), easing: 'step-end' });
+      /* the lit band, drawn as on the hero (js/heroes.js): a soft light under the front, and each square it has passed
+         comes up violet and fades over the band's depth */
+      cv = d.createElement('canvas');
+      var cx = cv.getContext && cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.className = 'tw'; cv.setAttribute('aria-hidden', 'true');
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + 'px'; cv.style.height = H + 'px';
+      var t0 = 0, drop = function () { if (cv.parentNode) cv.parentNode.removeChild(cv); };
+      var draw = function (now) {
+        if (me !== wave || !cx) { drop(); return; }
+        if (!t0) t0 = now;
+        var t = Math.min(1, (now - t0) / DUR), R = ease(t) * end, i, j, x, y, dist, u, al, g;
+        cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.globalAlpha = 1; cx.clearRect(0, 0, W, H);
+        g = cx.createRadialGradient(ox, oy, Math.max(0, R - B), ox, oy, R + c);
+        g.addColorStop(0, 'rgba(124,107,255,0)'); g.addColorStop(0.74, 'rgba(124,107,255,.16)'); g.addColorStop(1, 'rgba(124,107,255,0)');
+        cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+        for (j = j0; j <= j1; j++) for (i = i0; i <= i1; i++) {
+          x = L.x0 + i * c; y = L.y0 + j * c;
+          dist = Math.sqrt((x + c / 2 - ox) * (x + c / 2 - ox) + (y + c / 2 - oy) * (y + c / 2 - oy));
+          u = (R - dist) / B;
+          if (u <= 0 || u >= 1) continue;
+          al = u < 0.12 ? u / 0.12 : Math.pow(1 - (u - 0.12) / 0.88, 1.6);
+          cx.globalAlpha = al;
+          cx.fillStyle = 'rgba(124,107,255,.2)'; cx.fillRect(x, y, c, c);
+          cx.strokeStyle = 'rgba(124,107,255,.6)'; cx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1);
+        }
+        if (t < 1) requestAnimationFrame(draw); else drop();
+      };
+      r.classList.add('theming');
+      var vt = d.startViewTransition(apply);
+      vt.ready.then(function () {
+        r.animate(frames, { duration: DUR, pseudoElement: '::view-transition-new(root)' });
+        requestAnimationFrame(draw);
+      }).catch(function () { drop(); /* skipped: the colours have changed anyway */ });
+      var done = function () { if (me === wave) r.classList.remove('theming'); drop(); };
+      vt.finished.then(done, done);
+    });
+  })();
+
   /* 3. led by the scroll: the nav shrinks, a statement fills in word by word, covered cards step back,
         the service nearest the middle of the screen lights up, the footer name rises */
   var nav = d.querySelector('.nav'), fills = $('[data-fill]'), cards = $('.card'), rows = $('.svc>li'), mark = d.querySelector('.mark');

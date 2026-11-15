@@ -17,6 +17,20 @@
   --h1:clamp(3.6rem,9.4vw,8.75rem); --h2:clamp(2.4rem,5vw,4.5rem); --h3:clamp(1.75rem,2.8vw,2.5rem);
   --sans:"Inter Tight","Helvetica Neue",Arial,sans-serif; --display:"Funnel Display","Helvetica Neue",Arial,sans-serif; --mono:"Fragment Mono",ui-monospace,Menlo,monospace;
   --out:cubic-bezier(.16,1,.3,1); --back:cubic-bezier(.34,1.56,.64,1);
+  --on-ink:#fff; --sh:18,16,22; color-scheme:light;                         /* --on-ink: what stands on ink (a pill's label); --sh: shadows, as r,g,b */
+}
+/* dark (2026-11-15, Werner: "create a dark mode version"): the same page at night. It follows the system's setting until
+   the button in the nav picks one, which the page then keeps (js/contrast.js; the script in the head sets it before the
+   first paint). The violet and the contact panel stay as they are; the paper, ink and lines turn over */
+:root[data-theme="dark"]{
+  --paper:#100e14; --card:#1a1820; --ink:#f1f0f3; --grey:#9c97a8; --faint:#4a4655; --line:#2d2a35;
+  --mat:#221f2a; --lav:#231c40; --night:#09080c; --on-ink:#121016; --sh:0,0,0; color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#100e14; --card:#1a1820; --ink:#f1f0f3; --grey:#9c97a8; --faint:#4a4655; --line:#2d2a35;
+    --mat:#221f2a; --lav:#231c40; --night:#09080c; --on-ink:#121016; --sh:0,0,0; color-scheme:dark;
+  }
 }
 @media (min-width:761px){ :root{ --m:20px; --g:16px; } }
 /* 2026-11-15 (Werner: "increase the padding on the desktop version to 80px left and right"): the page margin grows from
@@ -32,7 +46,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 :focus-visible{outline:2px solid var(--stop);outline-offset:3px}
 ::selection{background:var(--stop);color:#fff}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.skip{position:absolute;left:var(--m);top:-100px;z-index:50;padding:8px 12px;background:var(--ink);color:#fff;border-radius:8px}
+.skip{position:absolute;left:var(--m);top:-100px;z-index:50;padding:8px 12px;background:var(--ink);color:var(--on-ink);border-radius:8px}
 .skip:focus{top:8px}
 .mono{font:400 .6875rem/1.45 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--grey)}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g)}
@@ -51,17 +65,17 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .w>span{display:inline-block}
 
 /* buttons: a pill and its arrow */
-.pill{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 8px 0 18px;border-radius:999px;background:var(--ink);color:#fff;font-weight:500;font-size:.9375rem;transition:background .25s var(--out)}
-.pill .arr{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--ink);transition:transform .35s var(--out)}
+.pill{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 8px 0 18px;border-radius:999px;background:var(--ink);color:var(--on-ink);font-weight:500;font-size:.9375rem;transition:background .25s var(--out),color .25s var(--out)}
+.pill .arr{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--on-ink);color:var(--ink);transition:transform .35s var(--out)}
 .pill svg,.go svg{width:14px;height:14px}
-.pill:hover{background:var(--stop)} .pill:hover .arr{transform:rotate(45deg)}
+.pill:hover{background:var(--stop);color:#fff} .pill:hover .arr{transform:rotate(45deg)}
 .go{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);transition:background .25s var(--out),color .25s var(--out),border-color .25s var(--out)}
 .ln{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:var(--faint)}
 .ln:hover{text-decoration-color:currentColor}
 
 /* ── nav: a pill that shrinks once you scroll ───────────────────────────── */
 .nav{position:sticky;top:12px;z-index:30;display:flex;align-items:center;gap:20px;height:52px;width:calc(100% - 2 * var(--m));max-width:2400px;margin:12px auto 0;padding:0 6px 0 20px;border:1px solid var(--line);border-radius:999px;background:var(--paper);transition:max-width .7s var(--out),box-shadow .4s}
-.nav.is-small{max-width:560px;box-shadow:0 8px 30px -18px rgba(18,16,22,.35)}
+.nav.is-small{max-width:560px;box-shadow:0 8px 30px -18px rgba(var(--sh),.35)}
 .brand{font-weight:600;letter-spacing:-.02em;white-space:nowrap}
 .brand .stop{width:.44em;height:.44em;margin-left:.2em}
 .brand .sur{transition:opacity .3s}
@@ -70,7 +84,21 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .nav .links a{padding:8px 12px;border-radius:999px;font-size:.9375rem;transition:background .2s}
 .nav .links a:hover{background:var(--mat)}
 .nav .pill{height:40px;font-size:.875rem}
-@media (max-width:760px){ .nav .links a.opt,.brand .sur{display:none} .nav{padding-left:16px} }
+/* the light and dark button (2026-11-15): a circle half filled, the page's dot turned into a switch */
+.mode{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);transition:background .25s var(--out),border-color .25s var(--out),color .25s var(--out)}
+.mode svg{width:18px;height:18px;transition:transform .6s var(--out)}
+.mode:hover{background:var(--mat)}
+.mode[aria-pressed="true"] svg{transform:rotate(180deg)}
+.nav .mode{margin-left:-8px}                                                 /* closer to the links than the nav's gap: it belongs with them */
+@media (max-width:760px){ .nav .links a.opt,.brand .sur{display:none} .nav{padding-left:16px;gap:12px} .nav .links a{padding-inline:9px} .nav .mode{margin-left:-4px} }
+/* the switch itself (js/contrast.js): the hero's wave. The new colours arrive square by square on the hero's grid,
+   from the button outwards, and a band of lit squares runs with the front and fades behind it (.tw, a canvas over the
+   page that the transition shows live). Nothing else moves on its own during it (the covers' names belong to the
+   page changes) */
+html.theming :not(.tw){view-transition-name:none !important}
+html.theming::view-transition-old(root),html.theming::view-transition-new(root){animation:none;mix-blend-mode:normal}
+.tw{position:fixed;left:0;top:0;z-index:100;pointer-events:none;view-transition-name:theme-wave}
+::view-transition-group(theme-wave),::view-transition-new(theme-wave){animation:none}
 
 /* ── hero ───────────────────────────────────────────────────────────────── */
 .hero{padding:clamp(40px,6.4vw,96px) var(--m) 0}
@@ -152,7 +180,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
    on the laptop's screen and turned to the front on hover; the laptop fades back as it turns (--k: 0 to 1) */
 .turn{position:absolute;inset:0;z-index:2;pointer-events:none}
 .turn img{position:absolute;left:0;top:0;max-width:none;max-height:none;transform-origin:0 0;opacity:0;border-radius:16px;backface-visibility:hidden;
-  box-shadow:0 50px 90px -40px rgba(18,16,22,calc(var(--k,0) * .55))}
+  box-shadow:0 50px 90px -40px rgba(var(--sh),calc(var(--k,0) * .55))}
 .js .mat[data-screens] .frame.f-cover.in img:not(.is-loading){opacity:calc(1 - var(--k,0) * .82)}
 
 /* the lightbox (js/contrast.js, 2026-11-15): a case page's pictures open large on a dark layer */
@@ -184,14 +212,14 @@ html.lb-open{overflow:hidden}
 .mat{position:relative;overflow:hidden;border-radius:var(--rs)}
 .frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .45s var(--out)}
 .frame.is-on{opacity:1}
-.frame img{min-width:0;min-height:0;max-width:100%;max-height:100%;width:auto;height:auto;border-radius:6px;box-shadow:0 0 0 1px rgba(18,16,22,.08),0 24px 48px -32px rgba(18,16,22,.28);transition:opacity .3s}
+.frame img{min-width:0;min-height:0;max-width:100%;max-height:100%;width:auto;height:auto;border-radius:6px;box-shadow:0 0 0 1px rgba(var(--sh),.08),0 24px 48px -32px rgba(var(--sh),.28);transition:opacity .3s}
 .frame img.is-loading{opacity:0}
 .bare .frame img,.bleed .frame img{box-shadow:none;border-radius:0}
 .bleed .frame img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:var(--pos,50% 0)}
 /* a card's cover (2026-11-14, Werner): the live site's picture of the project, its devices cut out, so the grid shows
    around them. It is all a card shows: no caption, no stepping. It arrives from below, tipped back, and settles
    when the card comes into view (.in, js) */
-.frame.f-cover img{border-radius:0;box-shadow:none;filter:drop-shadow(0 26px 28px rgba(18,16,22,.2))}
+.frame.f-cover img{border-radius:0;box-shadow:none;filter:drop-shadow(0 26px 28px rgba(var(--sh),.2))}
 .panel.night .frame.f-cover img{filter:drop-shadow(0 24px 44px rgba(124,107,255,.3))}
 @media (prefers-reduced-motion:no-preference){
   .js .frame.f-cover:not(.in){opacity:0}
@@ -297,6 +325,10 @@ html.lb-open{overflow:hidden}
 .track{display:flex;align-items:center;width:max-content;animation:marq 46s linear infinite}
 .marq:hover .track{animation-play-state:paused}
 .track img{flex:none;height:calc(var(--h) * 1.15px);width:auto;margin-right:clamp(56px,6.5vw,104px);opacity:.9}   /* the files are ink already (2026-11-15): no filter, which Safari painted blurred in the moving strip */
+/* each logo is there twice, ink and white (assets/make-logos.mjs), and the page shows the one for its colours */
+.track img.on-dark{display:none}
+:root[data-theme="dark"] .track img.on-light{display:none} :root[data-theme="dark"] .track img.on-dark{display:block}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .track img.on-light{display:none} :root:not([data-theme="light"]) .track img.on-dark{display:block} }
 @keyframes marq{to{transform:translateX(-50%)}}
 
 /* ── skills: big rows on hairlines; a row opens on a click (the live site's services, one open at a time) ──
@@ -385,7 +417,7 @@ html:not(.js) .svc .tog{display:none}
 }
 
 /* ── contact: the violet panel ──────────────────────────────────────────── */
-.cta{display:grid;gap:clamp(36px,5vw,72px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--stop);color:var(--night)}
+.cta{--ink:#121016;--on-ink:#fff;--night:#15111f;display:grid;gap:clamp(36px,5vw,72px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--stop);color:var(--night)}   /* its own ink: the panel looks the same on the light and the dark page */
 .cta .mono{color:rgba(21,17,31,.7)}
 .cta .big{font-size:var(--h2);line-height:1.04;max-width:14em}   /* 2026-11-14 (Werner): a little more air between its three lines; it was .94 */
 .cta .stop{background:var(--night)}
