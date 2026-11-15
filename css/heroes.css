@@ -1,0 +1,122 @@
+/* Contrast · five alternatives for the hero (heroes.html). Each is one screen tall, labelled, with a Replay button.
+   They share contrast.css's type, colours and reveal classes; a section gets .on when it comes into view. */
+.heroes .hx{position:relative;display:flex;flex-direction:column;min-height:100svh;padding:92px var(--m) 30px;border-top:1px solid var(--line);overflow:clip}
+.heroes .hx:first-of-type{border-top:0}
+.heroes{margin-top:-64px}                                             /* the nav floats over the first hero, so each is exactly one screen */
+.hx-lab{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 18px;padding-bottom:18px}
+.hx-lab b{font-weight:400;color:var(--ink)}
+.hx-lab .what{text-transform:none;letter-spacing:0}
+.hx-lab button{margin-left:auto;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.hx-pick{position:fixed;left:50%;bottom:14px;z-index:40;display:flex;gap:2px;padding:4px;border-radius:999px;background:var(--night);transform:translateX(-50%)}
+.hx-pick a{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;color:#fff;transition:background .25s var(--out)}
+.hx-pick a:hover{background:rgba(255,255,255,.14)} .hx-pick a[aria-current]{background:var(--stop)}
+.hx h1{font-size:var(--h1);line-height:.88;letter-spacing:-.055em}
+.hx .body{flex:1}
+
+/* ── A · fluted glass ───────────────────────────────────────────────────── */
+.hx-a .body{display:grid;grid-template-columns:minmax(0,1fr);gap:28px var(--g)}
+.hx-a .copy{display:grid;gap:26px;align-content:end;padding-bottom:10px}
+/* the glass: a row of ribs. Each rib holds the whole scene, squeezed around the rib's own centre, which is what a
+   reed of glass does to whatever is behind it. --k is the squeeze: .4 is fluted, 1 is clear */
+.glass{position:relative;display:flex;min-height:380px;border-radius:var(--r);overflow:hidden;isolation:isolate;background:var(--stop)}
+.strip{position:relative;flex:1;overflow:hidden}
+.scene{position:absolute;top:0;bottom:0;left:calc(var(--i) * -100%);width:calc(var(--n) * 100%);transform-origin:calc((var(--i) + .5) / var(--n) * 100%) 50%;transform:scaleX(var(--k,.4));
+  background:radial-gradient(60% 50% at 24% 20%,#b9afff 0,rgba(185,175,255,0) 72%),radial-gradient(75% 60% at 82% 88%,#4a38d4 0,rgba(74,56,212,0) 70%),var(--stop)}
+.scene img{position:absolute;left:50%;bottom:0;height:90%;width:auto;max-width:none;transform:translateX(-50%)}
+.glass::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,.3) 0,rgba(255,255,255,0) 32%,rgba(18,16,22,0) 62%,rgba(18,16,22,.26) 100%);background-size:calc(100% / var(--n)) 100%}
+.glass .hint{position:absolute;left:12px;bottom:12px;z-index:2;padding:5px 10px;border-radius:999px;background:var(--paper);color:var(--ink)}
+@media (hover:none){ .glass .hint{display:none} }
+@media (min-width:900px){
+  .hx-a .body{grid-template-columns:repeat(12,minmax(0,1fr))}
+  .hx-a .copy{grid-column:1 / span 7}
+  .glass{grid-column:8 / span 5}
+}
+
+/* ── B · type only ──────────────────────────────────────────────────────── */
+.hx-b .body{position:relative;display:grid;grid-template-rows:auto 1fr auto;isolation:isolate}
+.hx-b .meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 20px}
+.hx-b h1{align-self:end;font-size:clamp(4.6rem,17.6vw,17.5rem);line-height:.84;letter-spacing:-.065em}
+.hx-b .lede{justify-self:end;margin-top:clamp(20px,2.6vw,36px)}
+.hx-b .xh,.hx-b .xv{display:none;position:absolute;z-index:-1;background:var(--line);pointer-events:none}
+.js .hx-b .xh,.js .hx-b .xv{display:block}
+.hx-b .xh{left:calc(-1 * var(--m));right:calc(-1 * var(--m));top:var(--sy,-9px);height:1px;transform:scaleX(0);transform-origin:calc(var(--sx,0px) + var(--m)) 50%}
+.hx-b .xv{top:-140px;bottom:-60px;left:var(--sx,-9px);width:1px;transform:scaleY(0);transform-origin:50% calc(var(--sy,0px) + 140px)}
+.hx-b.on .xh{transform:none;transition:transform 1.4s var(--out) 1.3s}
+.hx-b.on .xv{transform:none;transition:transform 1.4s var(--out) 1.42s}
+
+/* ── C · zero to one ────────────────────────────────────────────────────── */
+.hx-c .body{display:grid;grid-template-rows:1fr auto auto}
+.hx-c h1{align-self:center}
+.roll{display:block;height:1.2em;line-height:1.2;margin:-.16em 0 -.16em;overflow:hidden}
+.roll>span{display:block;transform:translateY(-75%)}
+.roll>span>span{display:block;height:1.2em;white-space:nowrap}
+.ruler{position:relative;height:66px;margin-inline:calc(-1 * var(--m));border-top:1px solid var(--line);--w:calc(100% - 2 * var(--m))}
+.tick{position:absolute;top:0;left:calc(var(--m) + var(--w) * var(--x));width:1px;height:12px;background:var(--grey)}
+.tick span{position:absolute;top:20px;left:0;white-space:nowrap;transform:translateX(-50%)}
+.tick:nth-of-type(2) span{transform:none} .tick:last-of-type span{transform:translateX(-100%)}
+.ruler .dot{position:absolute;top:0;left:calc(100% - var(--m));z-index:1;width:13px;height:13px;margin:-6.5px;border-radius:50%;background:var(--stop)}
+.hx-c .under{display:grid;gap:14px var(--g);padding-top:22px;align-items:end}
+@media (min-width:900px){ .hx-c .under{grid-template-columns:7fr 5fr} .hx-c .under .mono{text-align:right} }
+@media (max-width:600px){ .tick:nth-of-type(3) span,.tick:nth-of-type(4) span,.tick:nth-of-type(5) span{display:none} }
+
+/* ── D · the panel ──────────────────────────────────────────────────────── */
+.hx-d .panel2{position:relative;flex:1;display:grid;align-items:end;min-height:500px;border-radius:var(--r);overflow:hidden;color:#fff;
+  background:radial-gradient(70% 60% at 18% 12%,#ab9fff 0,rgba(171,159,255,0) 70%),radial-gradient(80% 70% at 86% 92%,#4532d0 0,rgba(69,50,208,0) 70%),var(--stop)}
+.hx-d h1{position:absolute;left:0;right:0;top:10%;text-align:center;white-space:nowrap;font-size:clamp(2.6rem,12.3vw,12.6rem);letter-spacing:-.06em;translate:calc(var(--px,0) * -16px) 0}
+.hx-d .stop{background:var(--night)}
+.hx-d .who{position:absolute;left:50%;bottom:0;height:84%;width:auto;max-width:none;transform:translateX(-50%);translate:calc(var(--px,0) * 10px) 0}
+.chip{position:absolute;right:4.5%;top:44%;max-width:236px;padding:14px 16px;border-radius:14px;background:var(--paper);color:var(--ink);font-size:.9375rem;line-height:1.25}
+.chip .mono{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.live{width:7px;height:7px;border-radius:50%;background:var(--stop)}
+.bar{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:rgba(21,17,31,.22);border-top:1px solid rgba(255,255,255,.22)}
+.bar span{padding:13px 16px;color:#fff;border-left:1px solid rgba(255,255,255,.22)}
+.bar span:first-child{border-left:0}
+@media (max-width:760px){ .bar span:nth-child(3){border-left:0} .bar span:nth-child(n+3){border-top:1px solid rgba(255,255,255,.22)} .chip{top:auto;bottom:112px;right:12px;max-width:190px} }
+@media (min-width:761px){ .bar{grid-template-columns:repeat(4,minmax(0,1fr))} }
+
+/* ── E · numbers ────────────────────────────────────────────────────────── */
+.hx-e .body{position:relative;display:grid;grid-template-columns:minmax(0,1fr);border-block:1px solid var(--line)}
+.hx-e .l,.hx-e .r{display:flex;flex-direction:column;justify-content:space-between;gap:36px;padding-block:20px 26px}
+.hx-e h1{font-size:clamp(2.9rem,7.4vw,7rem);line-height:.92;letter-spacing:-.05em}
+.hx-e h1 .v{color:var(--stop)} .hx-e h1 .gy{color:var(--grey)}
+.dots i{display:inline-block;width:9px;height:9px;margin-right:4px;border-radius:50%;border:1px solid var(--grey)}
+.dots i:first-child{background:var(--stop);border-color:var(--stop)}
+.hx-e .r{position:relative}
+.hx-e .num{display:block;font-size:clamp(7rem,21vw,20rem);font-weight:640;letter-spacing:-.07em;line-height:.8;color:var(--stop);font-variant-numeric:tabular-nums}
+.stat1{display:grid;gap:14px}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:var(--g);padding-top:16px;border-top:1px solid var(--line)}
+.mini b{display:block;margin-bottom:8px;font-size:var(--h2);font-weight:640;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.hx-e .pin{display:none}
+@media (min-width:900px){
+  .hx-e .body{grid-template-columns:7fr 5fr}
+  .hx-e .r{padding-left:28px;border-left:1px solid var(--line)}
+  .hx-e .stat1{justify-items:end;text-align:right}
+  .hx-e .pin{display:block;left:0} .hx-e .pin:nth-of-type(1){top:0} .hx-e .pin:nth-of-type(2){top:100%}
+}
+
+/* ── their motion ───────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion:no-preference){
+  /* A: the ribs form one after the other; the portrait drifts a little behind them */
+  .js .hx-a:not(.on) .scene{transform:scaleX(.06)}
+  .hx-a.on .scene{transition:transform 1.5s var(--out) calc(var(--i) * 32ms + 250ms)}
+  .hx-a.on .glass.live .scene{transition:transform .5s var(--out)}
+  .scene img{animation:drift 9s ease-in-out infinite alternate}
+  @keyframes drift{to{transform:translateX(-45%)}}
+  /* C: the word rolls through the stages, the dot runs the ruler */
+  .js .hx-c:not(.on) .roll>span{transform:none}
+  .js .hx-c:not(.on) .ruler .dot{left:var(--m)}
+  .hx-c.on .roll>span{animation:roll 3.8s var(--out) .5s both}
+  .hx-c.on .ruler .dot{animation:run 3.8s var(--out) .5s both}
+  @keyframes roll{0%,20%{transform:translateY(0)}28%,48%{transform:translateY(-25%)}56%,76%{transform:translateY(-50%)}84%,100%{transform:translateY(-75%)}}
+  @keyframes run{0%{left:var(--m)}20%,28%{left:calc(var(--m) + var(--w) * .25)}48%,56%{left:calc(var(--m) + var(--w) * .5)}76%,84%{left:calc(var(--m) + var(--w) * .75)}100%{left:calc(100% - var(--m))}}
+  /* D: the panel wipes up, the portrait follows, the dot by "Now" breathes */
+  .js .hx-d:not(.on) .panel2{clip-path:inset(100% 0 0 0 round var(--r))}
+  .hx-d.on .panel2{clip-path:inset(0 round var(--r));transition:clip-path 1.2s var(--out)}
+  .js .hx-d:not(.on) .who{transform:translate(-50%,14%)}
+  .hx-d.on .who{transition:transform 1.4s var(--out) .3s,translate .6s var(--out)}
+  .hx-d h1{transition:translate .6s var(--out)}
+  .js .hx-d:not(.on) .chip{opacity:0;transform:translateY(16px)}
+  .hx-d.on .chip{transition:opacity .8s var(--out) 1s,transform .8s var(--out) 1s}
+  .live{animation:live 2.2s ease-in-out infinite}
+  @keyframes live{50%{box-shadow:0 0 0 6px rgba(124,107,255,.22)}}
+}

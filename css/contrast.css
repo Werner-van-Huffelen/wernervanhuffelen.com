@@ -1,0 +1,416 @@
+/* ==========================================================================
+   Contrast · the second plain edition of Full Stop (concept, 2026-11-14)
+
+   From Werner's references: one tight grotesk in two weights (light against bold), mono capitals for labels,
+   big numerals, flat colour grounds behind the images. From loopsii.com: soft grey paper, construction lines,
+   a pill nav that shrinks, cards that stack as you scroll, a dark panel with a diagonal headline, wide spacing.
+   His own: the copy, the violet, and the full stop, which here also marks every crossing of two lines.
+   Display type is Inter Tight from Google Fonts (linked for the concept; host it yourself if this ships).
+   ========================================================================== */
+
+@font-face{font-family:"Fragment Mono";font-style:normal;font-weight:400;font-display:swap;src:url(../assets/fonts/fragment-mono-latin.woff2) format("woff2")}
+
+:root{
+  --paper:#f1f0f3; --card:#fff; --ink:#121016; --grey:#6d6877; --faint:#bcb8c6; --line:#d8d5de;
+  --mat:#e8e5ee; --lav:#e2dcff; --night:#15111f; --stop:#7c6bff;
+  --m:16px; --g:12px; --r:20px; --rs:10px; --sec:clamp(96px,13vw,200px);
+  --h1:clamp(3.6rem,9.4vw,8.75rem); --h2:clamp(2.4rem,5vw,4.5rem); --h3:clamp(1.75rem,2.8vw,2.5rem);
+  --sans:"Inter Tight","Helvetica Neue",Arial,sans-serif; --mono:"Fragment Mono",ui-monospace,Menlo,monospace;
+  --out:cubic-bezier(.16,1,.3,1); --back:cubic-bezier(.34,1.56,.64,1);
+}
+@media (min-width:761px){ :root{ --m:20px; --g:16px; } }
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:88px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1rem/1.45 var(--sans);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;overflow-x:clip}
+h1,h2,h3,p,figure,dl,dd,ul,ol{margin:0;padding:0} h1,h2,h3{font-size:inherit;font-weight:inherit}
+ul,ol{list-style:none} img{display:block;max-width:100%} a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--stop);outline-offset:3px}
+::selection{background:var(--stop);color:#fff}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip{position:absolute;left:var(--m);top:-100px;z-index:50;padding:8px 12px;background:var(--ink);color:#fff;border-radius:8px}
+.skip:focus{top:8px}
+.mono{font:400 .6875rem/1.45 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--grey)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g)}
+
+/* the full stop; a pin is the same dot where two construction lines cross */
+.stop{display:inline-block;width:.17em;height:.17em;margin-left:.04em;border-radius:50%;background:var(--stop)}
+.pin{position:absolute;z-index:2;width:7px;height:7px;margin:-3.5px;border-radius:50%;background:var(--stop)}
+
+/* type: light against bold */
+.big{font-weight:300;letter-spacing:-.045em;line-height:.94;text-wrap:balance}
+.big .b,.big b{font-weight:640}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em;margin-bottom:-.14em}
+.w>span{display:inline-block}
+
+/* buttons: a pill and its arrow */
+.pill{display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 8px 0 18px;border-radius:999px;background:var(--ink);color:#fff;font-weight:500;font-size:.9375rem;transition:background .25s var(--out)}
+.pill .arr{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--ink);transition:transform .35s var(--out)}
+.pill svg,.go svg{width:14px;height:14px}
+.pill:hover{background:var(--stop)} .pill:hover .arr{transform:rotate(45deg)}
+.go{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);transition:background .25s var(--out),color .25s var(--out),border-color .25s var(--out)}
+.ln{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:var(--faint)}
+.ln:hover{text-decoration-color:currentColor}
+
+/* ── nav: a pill that shrinks once you scroll ───────────────────────────── */
+.nav{position:sticky;top:12px;z-index:30;display:flex;align-items:center;gap:20px;height:52px;width:calc(100% - 2 * var(--m));max-width:2400px;margin:12px auto 0;padding:0 6px 0 20px;border:1px solid var(--line);border-radius:999px;background:var(--paper);transition:max-width .7s var(--out),box-shadow .4s}
+.nav.is-small{max-width:560px;box-shadow:0 8px 30px -18px rgba(18,16,22,.35)}
+.brand{font-weight:600;letter-spacing:-.02em;white-space:nowrap}
+.brand .stop{width:.44em;height:.44em;margin-left:.2em}
+.brand .sur,.nav .clock{transition:opacity .3s}
+.nav.is-small .sur,.nav.is-small .clock{display:none}
+.nav .clock{margin-right:auto}
+.nav .links{display:flex;gap:4px;margin-left:auto}
+.nav .links a{padding:8px 12px;border-radius:999px;font-size:.9375rem;transition:background .2s}
+.nav .links a:hover{background:var(--mat)}
+.nav .pill{height:40px;font-size:.875rem}
+@media (max-width:760px){ .nav .clock,.nav .links a.opt,.brand .sur{display:none} .nav{padding-left:16px} }
+
+/* ── hero ───────────────────────────────────────────────────────────────── */
+.hero{padding:clamp(40px,6.4vw,96px) var(--m) 0}
+.hero-top{row-gap:20px;align-items:end}
+.hero-top>*{grid-column:1 / -1}
+.hero h1{font-size:var(--h1);line-height:.88;letter-spacing:-.055em}
+.lede{font-size:clamp(1.0625rem,1.4vw,1.3125rem);line-height:1.28;letter-spacing:-.015em;max-width:21em;text-wrap:pretty}
+@media (min-width:900px){
+  .hero-top>h1{grid-column:1 / span 8}
+  .hero-top>.lede{grid-column:9 / span 4;padding-bottom:.7em}
+}
+/* the stage: two rules, two verticals, a dot at each crossing, six projects between them */
+.stage{position:relative;--in:clamp(0px,6.2vw,96px);margin:clamp(44px,5.4vw,84px) calc(-1 * var(--m)) 0;padding:0 var(--in);border-block:1px solid var(--line)}
+.stage::before,.stage::after{content:"";position:absolute;top:-36px;bottom:-36px;width:1px;background:var(--line)}
+.stage::before{left:var(--in)} .stage::after{right:var(--in)}
+.stage .pin:nth-of-type(1){left:var(--in);top:0} .stage .pin:nth-of-type(2){right:var(--in);top:0;margin-right:-3.5px}
+.stage .pin:nth-of-type(3){left:var(--in);bottom:0;margin-bottom:-3.5px} .stage .pin:nth-of-type(4){right:var(--in);bottom:0;margin:0 -3.5px -3.5px 0}
+.stage .note{position:absolute;top:-24px} .stage .note.l{left:calc(var(--in) + 12px)} .stage .note.r{right:calc(var(--in) + 12px)}
+.mosaic{display:grid;grid-template-columns:repeat(3,1fr)}
+.tile{position:relative;display:block;aspect-ratio:4 / 5;overflow:hidden;background:var(--mat)}
+.tile.night{background:var(--night)}
+.tile img{width:100%;height:100%;object-fit:cover;object-position:var(--pos,50% 50%);transition:transform .9s var(--out)}
+.tile.fit img{object-fit:contain;padding:14% 12% 0;object-position:50% 0}
+.tile:hover img{transform:scale(1.06)}
+.tile .tag{position:absolute;left:8px;bottom:8px;padding:4px 8px;border-radius:999px;background:var(--paper);color:var(--ink);transform:translateY(140%);transition:transform .4s var(--out)}
+.tile:hover .tag,.tile:focus-visible .tag{transform:none}
+@media (hover:none){ .tile .tag{transform:none} }
+@media (max-width:760px){ .tile .nm{display:none} }      /* on a phone the number is enough */
+@media (min-width:761px){ .mosaic{grid-template-columns:repeat(6,1fr)} }
+
+/* ── section headings ───────────────────────────────────────────────────── */
+.sec{padding:var(--sec) var(--m) 0}
+.sec-h{display:grid;justify-items:center;gap:18px;text-align:center;margin-bottom:clamp(40px,5vw,80px)}
+.sec-h .big{font-size:var(--h2)}
+
+/* ── work: six cards that stack as you scroll ───────────────────────────── */
+/* the stack: a card sticks under the nav, each a step lower than the one before, and the next one slides over it
+   (js steps a covered card back a little: --c). 2026-11-14 (Werner): at every width, not only on a wide screen. A
+   card taller than the window (a phone) sticks later, once its foot has come into view: --h is its height, set by
+   js; without it the first value always wins */
+.stack{display:grid;gap:20px;--top:76px;--step:8px}
+.card{position:sticky;top:min(calc(var(--top) + var(--i) * var(--step)),calc(100svh - var(--h,0px) - 12px));display:grid;background:var(--card);border-radius:var(--r);overflow:hidden;transform-origin:50% 0;transform:scale(calc(1 - var(--c,0) * .045));will-change:transform}
+.card .txt{display:flex;flex-direction:column;gap:22px;padding:clamp(20px,2.4vw,36px)}
+.card .top{display:flex;justify-content:space-between;gap:16px}
+.card .top .n{color:var(--ink)}
+.card h3{font-size:var(--h3);font-weight:640;letter-spacing:-.04em;line-height:1}
+.card h3 a::after{content:"";position:absolute;inset:0;z-index:1}
+.card .line{font-size:clamp(1.0625rem,1.35vw,1.25rem);line-height:1.3;letter-spacing:-.015em;color:var(--grey);max-width:24em;text-wrap:pretty}
+.card .hd{margin-top:auto}                                               /* 2026-11-14 (Werner): name and line sit right above the list, not under the counter */
+.tags li{display:flex;align-items:center;gap:12px;padding-block:11px;border-top:1px solid var(--line);font-size:.9375rem}
+.tags li::before{content:"";width:6px;height:6px;background:var(--ink)}
+/* a card's tags: the skills the case used, from the CV's list and the Skills section's. Down one list; where the card's text
+   column is wide enough (on a phone and in the 900 to 1099px band, where it is not, it stays one list), in two columns of three */
+.card .tags{display:grid;gap:0 clamp(16px,2vw,28px)}
+@media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags:not(.few){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column} }
+.card .foot-row{display:flex;align-items:center;justify-content:space-between}
+.card:hover .go{background:var(--stop);border-color:var(--stop);color:#fff}
+.panel{position:relative;display:flex;flex-direction:column;min-height:300px;padding:clamp(16px,2vw,28px);background:var(--tint,var(--mat))}
+.panel.night{background:var(--night);color:#fff}
+/* 2026-11-14: a card's picture sits on its flat ground. It had the page's grid behind it for a while (Werner, then: "add
+   the grid behind the images on the case study cards"), and he took it out again. The tints (.lav, .mat, .night) stay */
+.panel .cell{flex:1;display:flex;flex-direction:column;min-height:0}
+.panel .mat{flex:1;min-height:220px}
+@media (min-width:900px){
+  .stack{--top:84px;--step:14px}
+  .card{grid-template-columns:5fr 7fr;min-height:min(640px,calc(100vh - 176px))}
+}
+
+/* a screen: whole, at its own proportions; several states step through, the caption names them */
+.mat{position:relative;overflow:hidden;border-radius:var(--rs)}
+.frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .45s var(--out)}
+.frame.is-on{opacity:1}
+.frame img{min-width:0;min-height:0;max-width:100%;max-height:100%;width:auto;height:auto;border-radius:6px;box-shadow:0 0 0 1px rgba(18,16,22,.08),0 24px 48px -32px rgba(18,16,22,.28);transition:opacity .3s}
+.frame img.is-loading{opacity:0}
+.bare .frame img,.bleed .frame img{box-shadow:none;border-radius:0}
+.bleed .frame img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:var(--pos,50% 0)}
+/* a card's cover (2026-11-14, Werner): the live site's picture of the project, its devices cut out, so the grid shows
+   around them. It is all a card shows: no caption, no stepping. It arrives from below, tipped back, and settles
+   when the card comes into view (.in, js) */
+.frame.f-cover img{border-radius:0;box-shadow:none;filter:drop-shadow(0 26px 28px rgba(18,16,22,.2))}
+.panel.night .frame.f-cover img{filter:drop-shadow(0 24px 44px rgba(124,107,255,.3))}
+@media (prefers-reduced-motion:no-preference){
+  .js .frame.f-cover:not(.in){opacity:0}
+  .js .frame.f-cover img{transform:perspective(1400px) translateY(13%) rotateX(16deg) rotateZ(-2.5deg) scale(.88);transition:transform 1.4s cubic-bezier(.2,.75,.2,1),opacity .3s}   /* a softer curve than --out, which is over in a blink */
+  .js .frame.f-cover.is-on.in img{transform:none}
+}
+.cap{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:0 16px;min-height:26px;padding-top:10px}
+.panel.night .cap,.night .cap{color:rgba(255,255,255,.6)}
+.cap button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;opacity:.6;padding-block:13px;margin-block:-13px;transition:opacity .2s}
+.cap button:hover,.cap button[aria-pressed="true"]{opacity:1}
+.cap button[aria-pressed="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.night .cap button[aria-pressed="true"]{color:#fff}
+.shot{background:var(--mat);padding:clamp(12px,1.6vw,24px);border-radius:var(--rs)}
+.shot.night{background:var(--night)} .shot.lav{background:var(--lav)}
+.shot .mat{aspect-ratio:var(--ar,16 / 10)}
+
+/* ── about ────────────────────────────────────────────────────────────────
+   2026-11-14 (Werner: alignment and spacing): the label has its own row, and under it the portrait, the statement
+   with the bio, and the facts stand in three columns (below). The statement stands right above the bio (Werner,
+   later that day: "closer to the text below"). The portrait is square and grows with the text when that is taller. */
+.about{row-gap:18px;container-type:inline-size;--c:calc(100cqw / 16)}   /* one grid square: 1/16 of the content width on a phone, 1/32 from 761px, as everywhere on the page; the portrait's grid and the rules beside it are drawn in it (cqw is read where it is used, in the children) */
+@media (min-width:761px){ .about{--c:calc(100cqw / 32)} }
+.about>*{grid-column:1 / -1}
+/* 2026-11-14 (Werner: the portrait as on the CV, his pick there): the cut-out alone, standing on a rule with a soft
+   violet light behind it. It was a violet tile. The rule is the one that closes the facts, carried on under him */
+.portrait{position:relative;width:min(300px,62vw);border-bottom:1px solid var(--line);overflow:hidden;
+  background:radial-gradient(ellipse 50% 44% at 50% 60%,rgba(124,107,255,.32),rgba(124,107,255,0) 100%)}
+.portrait::before{content:"";display:block;padding-top:100%}
+.portrait img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+/* the grid behind him (Werner, later that day): the page's own squares, counted from the left margin and up from the
+   rule he stands on, fading out towards the frame's edges as the hero's grid does. The horizontal lines sit 1px lower
+   than the box's padding edge, so that they fall where the 1px rules beside him do (a rule is drawn from its top edge) */
+.portrait::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(var(--line) 1px,transparent 1px) 0 calc(100% + 1px) / var(--c) var(--c),linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 100% / var(--c) var(--c);
+  -webkit-mask-image:radial-gradient(ellipse 72% 64% at 50% 62%,#000 32%,transparent 100%);mask-image:radial-gradient(ellipse 72% 64% at 50% 62%,#000 32%,transparent 100%)}
+.about>.say{margin-top:14px}
+.say{font-size:clamp(1.8rem,8vw,4.5rem);line-height:1.02;font-weight:400;letter-spacing:-.04em;text-wrap:balance}   /* below 900px (the desktop rule below sets its own): three balanced lines, set to fill the width (Werner, 2026-11-15: "fill out text") */
+@media (max-width:899px){ .about>.portrait{justify-self:center} }
+@media (min-width:600px) and (max-width:899px){ .say{font-size:5.3vw} }   /* two lines from 600px, filling the width; on a phone it would be hardly bigger than the bio, so there it stays three lines */                          /* and the portrait in the middle of the page */
+[data-fill] .w{color:var(--faint);transition:color .35s}
+[data-fill] .w.on{color:var(--ink)}
+.bio{margin-top:clamp(8px,1vw,22px);font-size:clamp(1.125rem,2.7vw,1.625rem);line-height:1.42;text-wrap:pretty}   /* below 900px: the whole width, a size up from the desktop's (the desktop rule below sets its own size and width) */
+.facts{margin-top:10px}
+.facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-block:10px;border-top:1px solid var(--line)}
+.facts>div:last-child{border-bottom:1px solid var(--line)}
+.facts dd{font-weight:500;text-align:right}
+/* 2026-11-14 (Werner: "30% / 40% / 30% columns with equal spacing between"): from 900px the section is three columns,
+   the portrait, the statement over the bio, the facts, in the proportion 3 : 4 : 3 of the width the two equal gaps
+   leave (percentages of the whole would leave no room for the gaps). The bio and the facts share a row, which ends
+   on the rule the portrait stands on. The statement is set to fit its column and sits at the foot of the row above.
+   2026-11-15 (Werner: "all the lines aligned with the grid on the image, the text should even out in terms of
+   spacing"): every rule beside the portrait is a whole number of squares above the one it stands on, so each one
+   continues a line of the grid behind him. A fact is a square high (two where its label sits above its value), so
+   its rules are grid lines; the bio's box is as many squares as its text needs (js/contrast.js sets --n, the number
+   of squares), with the text centred in it, so the air above and below it is equal; the statement stands one
+   square above the bio's rule.
+   2026-11-15 (Werner, a screenshot of the bio and the facts: "this section needs to be aligned"): the facts had been left
+   at the foot of the row, a square high each, so their top rule stood lower than the bio's. They now fill the row, as the
+   bio's box does: the two top rules and the two foot rules are the same lines. The rules between the facts divide the
+   height evenly, so they sit on the grid's lines where the height is a multiple of four squares (or each fact is a
+   whole number of them) and in between the lines otherwise. */
+@media (min-width:900px){
+  .about{--ag:clamp(24px,4vw,64px);grid-template-columns:3fr 4fr 3fr;grid-template-rows:auto 1fr auto;column-gap:var(--ag);row-gap:0}   /* the statement's row is the flexible one: whatever the portrait's square asks for beyond the bio's row goes there, so the bio's row stays whole squares */
+  .about>h2{margin-bottom:18px}
+  .about>.portrait{grid-column:1;grid-row:2 / span 2;width:auto}
+  .about>.say{grid-column:2 / span 2;grid-row:2;align-self:end;margin:0;padding-bottom:var(--c);font-size:clamp(1.75rem,3.75vw,6.25rem)}   /* 2026-11-15 (Werner): the statement runs over the bio's column and the facts'; first set large on three lines, then ("change the about headline to 2 lines, and reduce the font size to fill out 2 lines") on two balanced lines, the size at which they fill the two columns (the text is about 33 times the font size wide) */
+  .about>.bio{grid-column:2;grid-row:3;margin:0;font-size:clamp(1.0625rem,1.3vw,1.1875rem);display:flex;flex-direction:column;justify-content:center;min-height:calc(var(--n,5) * var(--c));padding-block:calc(var(--c) * .28);border-block:1px solid var(--line)}
+  .about>.facts{grid-column:3;grid-row:3;margin:0;display:grid;grid-template-rows:repeat(4,minmax(var(--c),1fr))}   /* as tall as the bio's box (the row), so their rules meet at the top as well as at the foot; each fact at least a square */
+  .facts>div{align-items:center;padding-block:0}
+}
+/* a narrower facts column (under about 250px: below 1000px): the label above its value, which then has the whole column */
+@media (min-width:900px) and (max-width:999px){
+  .about>.facts{grid-template-rows:repeat(4,minmax(calc(var(--c) * 2),1fr))}
+  .facts>div{flex-direction:column;justify-content:center;gap:2px;align-items:flex-start}
+  .facts dd{text-align:left}
+}
+
+/* ── clients: a light purple strip of logos on the grid ───────────────────
+   2026-11-14 (Werner: "just a simple strip, keep the rectangle pattern behind it"; it was a tall panel with a
+   headline in two corners). The strip is as wide as the hero's timeline, so it is cut into the same 32 squares (16
+   on a phone) and its lines continue the hero's; it is a whole number of squares high, so the pattern is never cut
+   through a square. The label above it is the old headline's words. Later that day (Werner): light purple, not
+   dark, so the logos are ink and the grid's lines violet. */
+.strip{container-type:inline-size;border-radius:var(--r);background:var(--lav);overflow:hidden}
+.marq{--c:3.125cqw;position:relative;display:grid;align-items:center;height:calc(var(--c) * 4);
+  background:linear-gradient(rgba(124,107,255,.24) 1px,transparent 1px) 0 -1px / var(--c) var(--c),linear-gradient(90deg,rgba(124,107,255,.24) 1px,transparent 1px) -1px 0 / var(--c) var(--c)}
+@media (max-width:760px){ .marq{--c:6.25cqw} }
+@supports (width:round(nearest,1px,1px)){ .marq{height:round(nearest,170px,var(--c))} }
+.belt{overflow:hidden}
+.track{display:flex;align-items:center;width:max-content;animation:marq 46s linear infinite}
+.marq:hover .track{animation-play-state:paused}
+.track img{flex:none;height:calc(var(--h) * 1.15px);width:auto;margin-right:clamp(56px,6.5vw,104px);filter:brightness(0);opacity:.9}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* ── skills: big rows on hairlines; a row opens on a click (the live site's services, one open at a time) ──
+   The row nearest the middle of the screen is lit (js); an open row stays lit. Without scripts every row is dark
+   and open. */
+.svc>li{border-top:1px solid var(--line);transition:color .4s var(--out)}
+.svc>li:last-child{border-bottom:1px solid var(--line)}
+.js .svc>li{color:var(--faint)}
+.js .svc>li.is-lit,.js .svc>li:hover,.js .svc>li.is-open,.js .svc>li:focus-within{color:var(--ink)}
+.svc .head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px var(--g);align-items:center;width:100%;padding-block:clamp(14px,1.7vw,24px);text-align:left}
+.svc .n,.svc .k,.svc .v{grid-column:1}
+.svc .k{font-size:var(--h2);font-weight:400;letter-spacing:-.045em;line-height:1}
+.svc>li.is-lit .k,.svc>li.is-open .k{font-weight:640}
+.svc .n,.svc .v{color:inherit}
+.svc .tog{grid-column:2;grid-row:1 / span 3;position:relative;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--ink);transition:background .25s var(--out),border-color .25s var(--out),color .25s var(--out),transform .5s var(--out)}
+.svc .tog i{position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px -7px;border-radius:1px;background:currentColor;transition:transform .5s var(--out)}
+.svc .tog i:last-child{transform:rotate(90deg)}
+.svc .head:hover .tog,.svc>li.is-open .tog{background:var(--stop);border-color:var(--stop);color:#fff}
+.svc>li.is-open .tog i:last-child{transform:none}
+html:not(.js) .svc .tog{display:none}
+.svc .more{display:grid;grid-template-rows:1fr}
+.js .svc .more{grid-template-rows:0fr;transition:grid-template-rows .6s var(--out)}
+.js .svc>li.is-open .more{grid-template-rows:1fr}
+.svc .more>.in{min-height:0;overflow:hidden}
+.js .svc .more>.in{visibility:hidden;transition:visibility 0s .6s}
+.js .svc>li.is-open .more>.in{visibility:visible;transition-delay:0s}
+.svc .body{display:grid;gap:clamp(20px,2.2vw,30px) var(--g);padding-block:6px clamp(26px,3vw,44px);color:var(--ink)}
+.svc .txt{display:grid;gap:.8em;font-size:clamp(1.0625rem,1.3vw,1.1875rem);line-height:1.42;max-width:33em;text-wrap:pretty}
+.svc .txt p+p{color:var(--grey)}
+/* 2026-11-14 (Werner): the list in two rows of three (on a phone three rows of two), the text under it. build.mjs
+   fills the list up to six, so every row's rule runs the whole width; an empty cell has no square */
+.svc .tags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:0;border-bottom:1px solid var(--line)}
+.svc .tags li{min-width:0;padding-right:12px}
+.svc .tags li:empty::before{content:none}
+@media (min-width:900px){
+  .svc .head{grid-template-columns:repeat(12,minmax(0,1fr));align-items:baseline}
+  .svc .n{grid-column:1 / span 1} .svc .k{grid-column:2 / span 7} .svc .v{grid-column:9 / span 3}
+  .svc .tog{grid-column:12;grid-row:1;justify-self:end;align-self:center}
+  .svc .body{grid-template-columns:repeat(12,minmax(0,1fr));align-items:start}
+  .svc .tags{grid-column:2 / -1;grid-template-columns:repeat(3,minmax(0,1fr))} .svc .txt{grid-column:2 / span 7}
+}
+
+/* ── experience: a timeline, where skills are rows ─────────────────────────
+   2026-11-14 (Werner: make it look different from skills). The hero's ruler again: a line from edge to edge, a tick
+   where each job starts, the violet dot resting on now. On a wide screen it reads left to right, 2015 to now; the
+   list itself runs newest first (as a CV does), which is how a phone shows it, down a line at the left. */
+/* the CV: under the list, which on a wide screen is under BCG, the first column (2026-11-14, Werner); on a phone it
+   lines up with the text beside the line */
+.xp-cv{margin-top:30px;padding-left:22px}
+@media (min-width:900px){ .xp-cv{margin-top:clamp(26px,2.6vw,36px);padding-left:0} }
+.pill.dl:hover .arr{transform:translateY(2px)}                          /* a download: its arrow dips, where the others turn */
+.xp{position:relative;display:grid;gap:30px;padding-left:22px;border-left:1px solid var(--stop)}
+.xp::after{content:"";position:absolute;left:0;top:0;width:13px;height:13px;margin:-6.5px;border-radius:50%;background:var(--stop)}
+.xp li{position:relative}
+.xp li::before{content:"";position:absolute;left:-22px;top:.5em;width:10px;height:1px;background:var(--ink)}
+.xp .y{color:var(--ink)}
+.xp .k{margin-top:8px;font-size:clamp(1.5rem,2.2vw,2rem);font-weight:640;letter-spacing:-.035em;line-height:1.02;text-wrap:balance}
+.xp .v{margin-top:10px;color:var(--grey);text-wrap:pretty}
+/* 2026-11-14 (Werner): where the list runs down the page and there is the width for it, the role stands beside the
+   company, each in its own column, so the roles line up under one another. That starts at 700px, the first width
+   at which BCG's long role still fits on one line beside its company (below that it has the whole line to itself,
+   under the company). On a wide screen the four columns are too narrow for either: there the role stays below */
+@media (min-width:700px) and (max-width:899px){
+  .xp li{display:grid;grid-template-columns:minmax(0,14em) minmax(0,1fr);column-gap:20px;align-items:baseline}
+  .xp .y{grid-column:1 / -1}
+  .xp .v{margin-top:0}
+}
+@media (min-width:900px){
+  .xp{display:flex;flex-direction:row-reverse;gap:var(--g);margin-inline:calc(-1 * var(--m));padding:0 var(--m);border-left:0;border-top:1px solid var(--line)}
+  .xp::before{content:"";position:absolute;left:0;top:-1px;width:calc(100% - var(--m));height:1px;background:var(--stop);transform-origin:0 50%}
+  .xp::after{left:calc(100% - var(--m))}
+  .xp li{flex:1 1 0;min-width:0;padding:26px clamp(0px,1.4vw,24px) 0 0}
+  .xp li::before{left:0;top:0;width:1px;height:10px}
+}
+
+/* ── contact: the violet panel ──────────────────────────────────────────── */
+.cta{display:grid;gap:clamp(36px,5vw,72px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--stop);color:var(--night)}
+.cta .mono{color:rgba(21,17,31,.7)}
+.cta .big{font-size:var(--h2);line-height:1.04;max-width:14em}   /* 2026-11-14 (Werner): a little more air between its three lines; it was .94 */
+.cta .stop{background:var(--night)}
+.cta .row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
+.cta .pill:hover{background:#fff;color:var(--ink)} .cta .pill:hover .arr{background:var(--ink);color:#fff}
+.cta .ln{text-decoration-color:rgba(21,17,31,.4)}
+
+/* ── footer: the name, cut off by the edge ──────────────────────────────── */
+.foot{padding:clamp(40px,5vw,72px) var(--m) 0;overflow:hidden}
+.foot .row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 22px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.foot .row span{display:flex;flex-wrap:wrap;gap:0 22px}
+.foot a:hover{color:var(--ink)}
+/* 2026-11-14 (Werner): the whole name, not "Werner" alone. With its full stop and the wider word spaces (the tight
+   letter-spacing closes them otherwise) it is 8.26em wide, so this size makes it run from margin to margin at any
+   width */
+.mark{display:block;font-size:calc((100vw - 2 * var(--m)) / 8.4);word-spacing:.09em;font-weight:640;letter-spacing:-.075em;line-height:.8;margin:.05em 0 -.1em -.04em;white-space:nowrap;transform:translateY(calc((1 - var(--f,1)) * 34%))}
+.mark .stop{width:.15em;height:.15em}
+
+/* ── a case page ────────────────────────────────────────────────────────── */
+.chero{padding:clamp(40px,6vw,88px) var(--m) 0}
+.crumb{display:flex;gap:10px;margin-bottom:clamp(20px,2.4vw,32px)} .crumb a{color:var(--ink)}
+.lead{font-size:clamp(2.5rem,6.2vw,5.75rem);line-height:.94;max-width:14.5em}
+.spread{display:grid;gap:var(--g);margin-top:clamp(36px,4.6vw,72px)}
+.spread .side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--g)}
+.spread .side:has(>:only-child){grid-template-columns:minmax(0,1fr)}
+.spread .side .mat{aspect-ratio:16 / 10}
+@media (min-width:900px){
+  .spread{grid-template-columns:8fr 4fr;align-items:stretch}
+  .spread .side{grid-template-columns:minmax(0,1fr)}
+  .spread .side .shot{display:flex;flex-direction:column}
+  .spread .side .mat{aspect-ratio:auto;flex:1;min-height:150px}
+}
+/* the facts: cells between construction lines */
+.cells{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:var(--sec) 0 0;padding-inline:var(--m);border-block:1px solid var(--line)}
+.cells>div{position:relative;padding:18px 16px 22px 0;display:grid;gap:8px;align-content:start}
+.cells>div+div{padding-left:16px;border-left:1px solid var(--line)}
+.cells dd{font-size:clamp(1.0625rem,1.5vw,1.375rem);font-weight:500;letter-spacing:-.02em;line-height:1.15}
+.cells .pin{left:0;top:0}
+@media (max-width:760px){ .cells>div:nth-child(odd){padding-left:0;border-left:0} .cells>div:nth-child(n+3){border-top:1px solid var(--line)} .cells .pin{display:none} }
+@media (min-width:761px){ .cells{grid-template-columns:repeat(4,minmax(0,1fr))} }
+.told{row-gap:10px;padding-top:clamp(56px,7vw,112px)}
+.told>*{grid-column:1 / -1}
+.told p{font-size:clamp(1.375rem,2.5vw,2.25rem);line-height:1.14;letter-spacing:-.03em;max-width:25em;text-wrap:pretty}
+@media (min-width:900px){ .told>.lab{grid-column:1 / span 4;padding-top:.7em} .told>p,.told>.con{grid-column:5 / span 8} }
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px var(--g);margin-top:clamp(56px,7vw,112px);padding-top:18px;border-top:1px solid var(--line)}
+.stat b{display:block;font-size:clamp(3.25rem,7vw,6.5rem);font-weight:640;letter-spacing:-.06em;line-height:.9;color:var(--stop);font-variant-numeric:tabular-nums}
+.stat b.sm{font-size:clamp(2.25rem,4.2vw,4rem);line-height:1.46}
+.stat span{display:flex;gap:10px;margin-top:12px;color:var(--ink)} .stat span::before{content:"";width:18px;height:1px;background:var(--ink);margin-top:.7em}
+.decs{display:grid;gap:20px}
+.dec{display:grid;gap:20px;padding:clamp(20px,2.4vw,36px);background:var(--card);border-radius:var(--r)}
+.dec h3{font-size:var(--h3);font-weight:640;letter-spacing:-.04em;line-height:1;margin-top:14px;text-wrap:balance}
+.dec p{font-size:clamp(1rem,1.25vw,1.125rem);color:var(--grey);max-width:30em;margin-top:16px;text-wrap:pretty}
+.dec .shot .cap{display:none}
+@media (min-width:900px){ .dec{grid-template-columns:5fr 7fr;align-items:center} }
+.gal{display:grid;gap:var(--g)}
+@media (min-width:761px){ .gal{grid-template-columns:repeat(12,minmax(0,1fr))} .gal>*{grid-column:span 6} .gal>.tall{grid-column:span 4} .gal>.wide{grid-column:span 8} .gal>.strip{grid-column:span 12} }
+.gal .tall .mat{aspect-ratio:4 / 5} .gal .strip .mat{aspect-ratio:32 / 7} .gal .mat{aspect-ratio:16 / 10}
+.fine{margin-top:20px;color:var(--grey);font-size:.875rem;max-width:44em}
+.nextp{position:relative;display:grid;gap:clamp(40px,7vw,120px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--night);color:#fff;transition:background .4s var(--out)}
+.nextp:hover{background:#1f1a2e}
+.nextp .mono{color:rgba(255,255,255,.55)}
+.nextp .big{font-size:var(--h1);line-height:.9;letter-spacing:-.055em}
+.nextp .row{display:flex;justify-content:space-between;align-items:end;gap:20px}
+.nextp .go{border-color:rgba(255,255,255,.3);width:64px;height:64px} .nextp .go svg{width:20px;height:20px}
+.nextp:hover .go{background:var(--stop);border-color:var(--stop)}
+
+/* ── motion: everything below only runs with scripts on and motion allowed ─ */
+@media (prefers-reduced-motion:no-preference){
+  .js [data-in]{opacity:0;transform:translateY(28px);transition:opacity .9s var(--out) calc(var(--d,0) * 1ms),transform .9s var(--out) calc(var(--d,0) * 1ms)}
+  .js [data-in].in{opacity:1;transform:none}
+  .js [data-in="rise"]{opacity:1;transform:none}
+  .js [data-in="rise"] .w>span{transform:translateY(112%);transition:transform 1s var(--out) calc(var(--d,0) * 1ms + var(--i) * 55ms)}
+  .js [data-in="rise"].in .w>span{transform:none}
+  .js [data-in="rise"] .stop{transform:scale(0);transition:transform .6s var(--back) calc(var(--d,0) * 1ms + var(--i,3) * 55ms + 520ms)}
+  .js [data-in="rise"].in .stop{transform:none}
+  /* a wipe: the tile stays put (so it can be watched), its image rises into it */
+  .js [data-in="wipe"]{opacity:1;transform:none}
+  .js [data-in="wipe"] img{clip-path:inset(100% 0 0 0);transform:scale(1.18);transition:clip-path 1.1s var(--out) calc(var(--d,0) * 1ms),transform 1.5s var(--out) calc(var(--d,0) * 1ms)}
+  .js [data-in="wipe"].in img{clip-path:inset(0);transform:none}
+  .js [data-in="wipe"].in:hover img{transform:scale(1.06);transition:transform .9s var(--out)}
+  .js .pin{transform:scale(0);transition:transform .5s var(--back) calc(var(--d,600) * 1ms)}
+  .js .in .pin,.js .pin.in{transform:none}
+  .js .stage{border-color:transparent;background:linear-gradient(var(--line),var(--line)) top left / var(--lx,0%) 1px no-repeat,linear-gradient(var(--line),var(--line)) bottom right / var(--lx,0%) 1px no-repeat;transition:--lx 1.2s var(--out)}
+  .js .stage.in{--lx:100%}
+  /* experience: the line runs out to now, the dot with it, and each job comes in as the line passes its tick */
+  .js .xp li{opacity:0;transform:translateY(18px);transition:opacity .8s var(--out) calc(var(--i) * 260ms + 200ms),transform .8s var(--out) calc(var(--i) * 260ms + 200ms)}
+  .js .xp.in li{opacity:1;transform:none}
+  .js .xp::after{transform:scale(0);transition:transform .6s var(--back) 1.2s}
+  .js .xp.in::after{transform:none}
+  @media (min-width:900px){
+    .js .xp::before{transform:scaleX(0);transition:transform 1.5s var(--out)}
+    .js .xp.in::before{transform:none}
+    .js .xp::after{left:var(--m);transform:none;transition:left 1.5s var(--out)}
+    .js .xp.in::after{left:calc(100% - var(--m))}
+  }
+  @view-transition{navigation:auto}
+}
+@property --lx{syntax:"<percentage>";inherits:false;initial-value:0%}
+@media (prefers-reduced-motion:reduce){ .track{animation:none} *,*::before,*::after{transition-duration:0s !important} }
