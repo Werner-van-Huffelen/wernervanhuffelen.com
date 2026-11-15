@@ -24,6 +24,16 @@
 /* "over 10 years" (2026-11-14) made the sentence a word longer: on a wide screen it gets the room for two lines
    again; below that it is three even ones, which keep clear of the portrait */
 @media (min-width:1280px){ .cx .lead-in .lede{max-width:27.5em} }
+/* 2026-11-15 (Werner): a phone held sideways. The screen is too low for the headline over the sentence: the sentence
+   ran into the timeline. So they stand side by side, the headline as wide as its longest word, the sentence beside
+   it with its last line level with the headline's foot, and a gap above the timeline. The headline also keeps to the
+   screen's height, so the timeline and its labels stay in view under it. The portrait stays away: at this height it
+   would be a few squares across */
+@media (orientation:landscape) and (max-height:500px){
+  .cx .lead-in{grid-template-columns:max-content minmax(0,1fr);align-items:end;column-gap:clamp(24px,4vw,48px);padding-bottom:22px}
+  .cx h1{font-size:clamp(2.5rem,min(10.6vw,calc((100svh - 150px) / 1.8)),10rem)}
+  .cx .lead-in .lede{font-size:clamp(1.0625rem,2.2vw,1.3125rem);max-width:24em}
+}
 .cx .under{grid-template-columns:minmax(0,1fr);padding-top:18px}
 @media (min-width:900px){ .cx .under{grid-template-columns:minmax(0,1fr)} }
 
@@ -71,6 +81,7 @@
     left:calc(var(--m) + var(--c) * (var(--cols) - 16) + (var(--c) * 16 - var(--w)) / 2)}
   @supports (width:round(down,1px,1px)){ .js .cx-1 .who{--w:round(down,min(calc(var(--c) * 16),calc(100svh - 250px)),calc(var(--c) * 2))} }
 }
+@media (orientation:landscape) and (max-height:500px){ .cx-1 .who,.js .cx-1 .who{display:none} }   /* a phone held sideways: see .lead-in above */
 .cx-1 .who img{display:block;width:100%;height:100%}
 .js .cx-1 .who img{opacity:0}
 .cx-1 .who .px{position:absolute;left:calc(var(--c) * var(--x));top:calc(var(--c) * var(--y));width:var(--c);height:var(--c);opacity:0;

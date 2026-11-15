@@ -422,6 +422,15 @@ html:not(.js) .svc .tog{display:none}
     .js .xp::after{left:var(--m);transform:none;transition:left 1.5s var(--out)}
     .js .xp.in::after{left:calc(100% - var(--m))}
   }
+  /* 2026-11-15 (Werner): where the list runs down the page it comes in from the top: the dot on now first, then the
+     line draws down to the CV button, and each job comes in as the line reaches its tick, newest first (--j: its
+     place from the top; --i counts from 2015, for the wide timeline that runs left to right) */
+  @media (max-width:899px){
+    .js .xp li{transition-delay:calc(var(--j) * 260ms + 200ms)}
+    .js .xp::after{transition-delay:0s}
+    .js .xp::before{transform:scaleY(0);transform-origin:50% 0;transition:transform 1.3s cubic-bezier(.33,0,.4,1) .1s}
+    .js .xp.in::before{transform:none}
+  }
   @view-transition{navigation:auto}
 }
 @property --lx{syntax:"<percentage>";inherits:false;initial-value:0%}
