@@ -11,7 +11,7 @@
    10th on a phone), so js/heroes.js only nudges it by a hair. A low window still caps it (the 100svh term), so the
    sentence and the timeline stay in view under it. A phone held sideways keeps its own rule below */
 .cx-1 h1{font-size:min(calc(var(--c) * 3.89),calc((100svh - 420px) / 1.76))}
-@media (max-width:760px){ .cx-1 h1{font-size:calc(var(--c) * 2.78)} }
+@media (max-width:760px){ .cx-1 h1{font-size:min(calc(var(--c) * 2.78),87.6px)} }   /* the phone's 16 squares: up to 87.6px, the size the 32 squares give at 761px, so the headline never shrinks where the grid changes (uncapped it reached 120px at 720 and dropped to 88 at 761). From about 545px it holds at that size, and js/heroes.js nudges its full stop onto a line */
 .cx .under{display:grid;gap:14px var(--g);padding-top:22px;align-items:end}
 @media (min-width:900px){ .cx .under{grid-template-columns:7fr 5fr} .cx .under .mono{text-align:right} }
 .cx .roll>span{transform:translateY(-80%)}                              /* five slots, the first one empty: at rest it shows the last */
