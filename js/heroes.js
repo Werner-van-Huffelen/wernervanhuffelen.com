@@ -289,6 +289,38 @@
       for (var n = 0; n < N; n++) run(1400 + n * 1700 + Math.random() * 900);       /* they start one after another, over the first seconds */
     })();
 
+    /* The full stop of the headline's last word ("shipped.") sits on a crossing of the grid (2026-11-15, Werner: "align
+       the title so the purple dot on the headline always sits on the quadrant intersection"). Across, the headline's
+       size is nudged (the dot moves at most half a square, a few per cent of the size) so the dot meets a vertical
+       line while the headline keeps its left edge; down, the headline and the sentence move together by at most half
+       a square. Measured where the word comes to rest, whatever the roll is doing at the time, and again when the
+       font has arrived or the window changes. */
+    var h1 = sec.querySelector('h1'), leadIn = sec.querySelector('.lead-in'), inner = sec.querySelector('.roll > span'), last = sec.querySelector('.roll > span > span:last-child > .stop');
+    function restOf() {                                                    /* the dot's middle, with the word at rest */
+      var b = last.getBoundingClientRect(), ty = 0;
+      try { ty = new DOMMatrix(getComputedStyle(inner).transform).m42; } catch (e) { /* no transform */ }
+      return { x: b.left + b.width / 2, y: b.top + b.height / 2 - ty - 0.8 * inner.offsetHeight };
+    }
+    function snap() {
+      if (!h1 || !leadIn || !inner || !last) return;
+      h1.style.fontSize = ''; leadIn.style.transform = '';
+      var s = size(); if (!s.c) return;
+      var x0 = s.r.left + s.m, y0 = s.r.top + 1200, left = h1.getBoundingClientRect().left, p = restOf();
+      var tx = x0 + Math.round((p.x - x0) / s.c) * s.c + 0.5;            /* the nearest vertical line's middle */
+      for (var n = 0; n < 2 && p.x - left > 1; n++) {                       /* twice: type does not scale quite linearly */
+        h1.style.fontSize = (parseFloat(getComputedStyle(h1).fontSize) * (tx - left) / (p.x - left)).toFixed(3) + 'px';
+        p = restOf();
+      }
+      s = size(); y0 = s.r.top + 1200;                                      /* the new size can move the timeline, and the grid with it (a low window) */
+      var ty = y0 + Math.round((p.y - y0) / s.c) * s.c + 0.5;
+      leadIn.style.transform = 'translateY(' + (ty - p.y).toFixed(2) + 'px)';
+    }
+    snap();
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(snap);
+    var snapT = 0;
+    addEventListener('resize', function () { clearTimeout(snapT); snapT = setTimeout(snap, 120); });
+    sec._snap = snap;
+
     /* the dot's trail runs with the timeline (start calls this, and Replay with it), for as long as the dot travels */
     sec._follow = function () {
       if (!dot || still) return;
