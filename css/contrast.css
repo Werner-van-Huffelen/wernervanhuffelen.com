@@ -61,14 +61,13 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .nav.is-small{max-width:560px;box-shadow:0 8px 30px -18px rgba(18,16,22,.35)}
 .brand{font-weight:600;letter-spacing:-.02em;white-space:nowrap}
 .brand .stop{width:.44em;height:.44em;margin-left:.2em}
-.brand .sur,.nav .clock{transition:opacity .3s}
-.nav.is-small .sur,.nav.is-small .clock{display:none}
-.nav .clock{margin-right:auto}
+.brand .sur{transition:opacity .3s}
+.nav.is-small .sur{display:none}
 .nav .links{display:flex;gap:4px;margin-left:auto}
 .nav .links a{padding:8px 12px;border-radius:999px;font-size:.9375rem;transition:background .2s}
 .nav .links a:hover{background:var(--mat)}
 .nav .pill{height:40px;font-size:.875rem}
-@media (max-width:760px){ .nav .clock,.nav .links a.opt,.brand .sur{display:none} .nav{padding-left:16px} }
+@media (max-width:760px){ .nav .links a.opt,.brand .sur{display:none} .nav{padding-left:16px} }
 
 /* ── hero ───────────────────────────────────────────────────────────────── */
 .hero{padding:clamp(40px,6.4vw,96px) var(--m) 0}

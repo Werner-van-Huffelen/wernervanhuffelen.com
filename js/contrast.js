@@ -1,4 +1,4 @@
-/* Contrast · the one script: reveals, the scroll-led effects, the clock, the counters and the screens that step
+/* Contrast · the one script: reveals, the scroll-led effects, the counters and the screens that step
    through their states. Everything here is decoration: without it, or for a visitor who asked for less motion,
    the page reads the same. */
 (function () {
@@ -16,13 +16,7 @@
     watched.forEach(function (el) { io.observe(el); });
   } else watched.forEach(function (el) { el.classList.add('in'); });
 
-  /* 2. Berlin's time in the nav */
-  var clock = d.querySelector('[data-clock]');
-  if (clock && window.Intl) {
-    var fmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' });
-    var tick = function () { clock.textContent = 'Berlin ' + fmt.format(new Date()); };
-    tick(); setInterval(tick, 15000);
-  }
+  /* 2. (Berlin's time in the nav: taken out 2026-11-15, Werner: "feels a bit gimmicky") */
 
   /* 3. led by the scroll: the nav shrinks, a statement fills in word by word, covered cards step back,
         the service nearest the middle of the screen lights up, the footer name rises */
