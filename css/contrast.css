@@ -100,6 +100,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .sec{padding:var(--sec) var(--m) 0}
 .sec-h{display:grid;justify-items:center;gap:18px;text-align:center;margin-bottom:clamp(40px,5vw,80px)}
 .sec-h .big{font-size:var(--h2)}
+/* 2026-11-15 (Werner): on the homepage, Selected work and Experience start at the left edge, like the rest of the page */
+.sec-h.left{justify-items:start;text-align:left}
 
 /* ── work: six cards that stack as you scroll ───────────────────────────── */
 /* the stack: a card sticks under the nav, each a step lower than the one before, and the next one slides over it
@@ -289,8 +291,9 @@ html:not(.js) .svc .tog{display:none}
    list itself runs newest first (as a CV does), which is how a phone shows it, down a line at the left. */
 /* the CV: under the list, which on a wide screen is under BCG, the first column (2026-11-14, Werner); on a phone it
    lines up with the text beside the line */
-/* the header: the label, and at the right the line that sat under the hero's timeline until 2026-11-15 (Werner) */
-.xp-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 24px;margin-bottom:26px}
+/* the header: like Selected work's, the label over a headline, which is the line that sat under the hero's timeline
+   until 2026-11-15 (Werner: first at the header's right in small capitals, then "the same size as the selected work
+   header") */
 .xp-cv{margin-top:30px;padding-left:22px}
 @media (min-width:900px){ .xp-cv{margin-top:clamp(26px,2.6vw,36px);padding-left:0} }
 .pill.dl:hover .arr{transform:translateY(2px)}                          /* a download: its arrow dips, where the others turn */
