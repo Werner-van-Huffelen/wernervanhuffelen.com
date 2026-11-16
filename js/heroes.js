@@ -313,8 +313,11 @@
       h1.style.fontSize = ''; h1.style.translate = ''; leadIn.style.transform = '';
       var s = size(); if (!s.c) return;
       var y0 = s.r.top + 1200, p = restOf();
-      var ty = y0 + Math.floor((p.y - y0) / s.c) * s.c + 0.5;              /* the line at or above the dot: the headline only rises, away from the sentence */
-      h1.style.translate = '0 ' + (ty - p.y).toFixed(2) + 'px';
+      /* (2026-11-16, Werner: "reduce the gap between the title and subheader on the hero"): no longer moved. With the
+         sentence held two squares above the timeline, putting the full stop on a line meant moving the headline by up
+         to a square, so the gap under it changed with the width (31 to 85px). Now the gap is fixed (css/heroes-c.css),
+         and the full stop sits where the type puts it */
+      void y0; void p;
     }
     snap();
     if (d.fonts && d.fonts.ready) d.fonts.ready.then(snap);
