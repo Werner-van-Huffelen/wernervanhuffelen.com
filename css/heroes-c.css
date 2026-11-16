@@ -47,7 +47,7 @@
    square, which leaves the sentence and its two squares where they are. It no longer meets a vertical line as well:
    that took nudging the size, which made it jump as the window widened instead of growing evenly */
 .cx-1 h1{font-size:clamp(40px,calc(5vw + 24px),120px)}
-.cx-1 .lead-in .lede{font-size:clamp(20px,calc(1.25vw + 16px),40px)}
+.cx-1 .lead-in .lede{font-size:clamp(20px,calc(.75vw + 17.6px),32px)}   /* at most 32px (Werner, 2026-11-16: "reduce max font size for the subheader on the hero to 32px instead of 40px"), still growing evenly from 20px at 320px wide to 32px at 1920 */
 .cx-1 .lead-in{align-self:end;padding-bottom:calc(var(--c) * 2)}
 .cx .under{grid-template-columns:minmax(0,1fr);padding-top:18px}
 /* 2026-11-15 (Werner): the note under the timeline ("Getting sh*t done since 2015") moved to the Experience header.
