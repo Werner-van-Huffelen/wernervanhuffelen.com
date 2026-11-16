@@ -60,7 +60,14 @@
    IS the timeline, and every eighth vertical line meets a tick. A square is 1/32 of the ruler's length (1/16 on a
    phone), set in cqw: the section is the container and its content box is exactly the ruler's travel. The square
    under the pointer gets a .lit (js/heroes.js), which glows and fades. */
-.cx-1{container-type:inline-size;--c:3.125cqw;--cols:32}                /* --cols: squares across the ruler */
+.cx-1{container-type:inline-size;--c:3.125cqw;--cols:32}
+/* the hero's height (2026-11-16, Werner, a screenshot of a tablet held upright: "change the aspect ratio of the hero section
+   so it doesn't look weirdly elongated"): the whole screen, except on a screen held upright from 600px wide (a tablet, a
+   tall window), where it is at most .88 of the width; the work below then starts on the same screen. A phone keeps the
+   whole screen: its portrait stands behind the type and needs the height. The portrait's size reads --hh too */
+.cx-1{--hh:100svh}
+@media (min-width:600px) and (orientation:portrait){ .cx-1{--hh:min(100svh,88vw)} }
+.heroes .cx-1{min-height:var(--hh)}                /* --cols: squares across the ruler */
 @media (max-width:760px){ .cx-1{--c:6.25cqw;--cols:16} }
 /* 2026-11-15 (Werner, on his phone: "the timeline and text and dots on the hero are not aligned on the grid"): the
    lines are one repeating gradient over the whole grid, not a square tile repeated. Safari rounds a repeated tile
@@ -98,12 +105,12 @@
 .cx-1 .who{display:none}
 @media (min-width:900px){
   .cx-1 .who{display:block;position:absolute;z-index:-1;left:calc(var(--m) + var(--c) * 24);bottom:calc(100% + 1px);width:calc(var(--c) * 12);aspect-ratio:1;transform:translateX(-50%);pointer-events:none}
-  @supports (width:round(down,1px,1px)){ .cx-1 .who{width:round(down,min(calc(var(--c) * 16),calc(100svh - 250px),800px),calc(var(--c) * 2))} }   /* at most 800px (2026-11-16, Werner: "the size of the profile picture could be slightly bigger on the largest screen sizes", then "max 800px"); it was 720, so a 2560 screen had it at 600 */
+  @supports (width:round(down,1px,1px)){ .cx-1 .who{width:round(down,min(calc(var(--c) * 16),calc(var(--hh) - 250px),800px),calc(var(--c) * 2))} }   /* at most 800px (2026-11-16, Werner: "the size of the profile picture could be slightly bigger on the largest screen sizes", then "max 800px"); it was 720, so a 2560 screen had it at 600 */
 }
 @media (max-width:899px) and (prefers-reduced-motion:no-preference){
   .js .cx-1 .who{--w:calc(var(--c) * 16);display:block;position:absolute;z-index:-1;bottom:calc(100% + 1px);width:var(--w);aspect-ratio:1;pointer-events:none;
     left:calc(var(--m) + var(--c) * (var(--cols) - 16) + (var(--c) * 16 - var(--w)) / 2)}
-  @supports (width:round(down,1px,1px)){ .js .cx-1 .who{--w:round(down,min(calc(var(--c) * 16),calc(100svh - 250px)),calc(var(--c) * 2))} }
+  @supports (width:round(down,1px,1px)){ .js .cx-1 .who{--w:round(down,min(calc(var(--c) * 16),calc(var(--hh) - 250px)),calc(var(--c) * 2))} }
 }
 @media (orientation:landscape) and (max-height:500px){ .cx-1 .who,.js .cx-1 .who{display:none} }   /* a phone held sideways: see .lead-in above */
 .cx-1 .who img{display:block;width:100%;height:100%}
@@ -187,6 +194,28 @@
     40.38%,57.69%{transform:translateY(-40%);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
     65.38%,82.69%{transform:translateY(-60%);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
     90.38%,100%{transform:translateY(-80%)}
+  }
+  /* the homepage's hero (2026-11-16, motion audit): the dot moves by translate and the travelled line is uncovered by
+     clip-path, where they animated left and width, which laid the page out again on every frame. Same legs, same
+     curve. The section is a size container, so 100cqw is the dot's whole run, margin to margin. The other grounds
+     (heroes-c.html, exploring only) keep left and width */
+  .js .cx-1 .ruler .dot{left:var(--m)}
+  .js .cx-1:not(.on) .fill{width:calc(100% - var(--m));clip-path:inset(0 calc(100% - var(--m)) 0 0)}
+  .cx-1.on .ruler .dot{animation-name:crunT}
+  .cx-1.on .fill{animation-name:cfillC}
+  @keyframes crunT{
+    0%{translate:0;animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    18.25%,25%{translate:calc(100cqw * .25);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    43.25%,50%{translate:calc(100cqw * .5);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    68.25%,75%{translate:calc(100cqw * .75);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    93.25%,100%{translate:100cqw}
+  }
+  @keyframes cfillC{                                                    /* the line runs from the left edge: at first only the margin is travelled */
+    0%{clip-path:inset(0 calc(100% - var(--m)) 0 0);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    18.25%,25%{clip-path:inset(0 calc(100cqw * .75) 0 0);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    43.25%,50%{clip-path:inset(0 calc(100cqw * .5) 0 0);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    68.25%,75%{clip-path:inset(0 calc(100cqw * .25) 0 0);animation-timing-function:cubic-bezier(.25,.1,.25,1)}
+    93.25%,100%{clip-path:inset(0 0 0 0)}
   }
   @keyframes clit{from{color:var(--faint)}}
   @keyframes ctick{from{height:6px;background:var(--faint)}}

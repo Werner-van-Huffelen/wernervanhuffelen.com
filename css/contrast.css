@@ -78,12 +78,16 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .ln:hover{text-decoration-color:currentColor}
 
 /* ── nav: a pill that shrinks once you scroll ───────────────────────────── */
-.nav{position:sticky;top:12px;z-index:30;display:flex;align-items:center;gap:20px;height:52px;width:calc(100% - 2 * var(--m));max-width:2400px;margin:12px auto 0;padding:0 6px 0 20px;border:1px solid var(--line);border-radius:999px;background:var(--paper);transition:max-width .7s var(--out),box-shadow .4s}
+.nav{position:sticky;top:12px;z-index:30;display:flex;align-items:center;gap:20px;height:52px;width:calc(100% - 2 * var(--m));max-width:min(2400px,calc(100% - 2 * var(--m)));margin:12px auto 0;padding:0 6px 0 20px;border:1px solid var(--line);border-radius:999px;background:var(--paper);transition:max-width .35s var(--out),box-shadow .35s}
 .nav.is-small{max-width:560px;box-shadow:0 8px 30px -18px rgba(var(--sh),.35)}
 .brand{font-weight:600;letter-spacing:-.02em;white-space:nowrap}
 .brand .stop{width:.44em;height:.44em;margin-left:.2em}
-.brand .sur{transition:opacity .3s}
-.nav.is-small .sur{display:none}
+/* the surname fades out before it goes, and back in when it returns (2026-11-16, motion audit: it dropped out in one
+   frame while the pill took .7s to shrink; now one motion, the pill .35s). display waits for the fade (allow-discrete);
+   .grown (js) marks a nav that has been small, so the surname fades in on the way back but not on the page's load */
+.brand .sur{transition:opacity .15s ease-out,display .15s allow-discrete}
+.nav.is-small .sur{display:none;opacity:0}
+@starting-style{ .nav.grown .brand .sur{opacity:0} }
 .nav .links{display:flex;gap:4px;margin-left:auto}
 .nav .links a{padding:8px 12px;border-radius:999px;font-size:.9375rem;transition:background .2s}
 .nav .links a:hover{background:var(--mat)}
@@ -149,7 +153,11 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
    (js steps a covered card back a little: --c). 2026-11-14 (Werner): at every width, not only on a wide screen. A
    card taller than the window (a phone) sticks later, once its foot has come into view: --h is its height, set by
    js; without it the first value always wins */
-.stack{display:grid;gap:20px;--top:76px;--step:8px}
+/* the gap between two cards is a pause (2026-11-16, Werner, from a friend and Bakken & Bæck: the cards overlap quite
+   fast, "add a bit of delay on the overlapping card so it feels less busy"). With a 20px gap the next card began to
+   cover a card the moment it stuck; now a card stays whole for about a third of the window's height of scrolling
+   before the next one slides over it (120px at least, 360px at most) */
+.stack{display:grid;gap:clamp(120px,30vh,360px);gap:clamp(120px,30svh,360px);--top:76px;--step:8px}
 .card{position:sticky;top:min(calc(var(--top) + var(--i) * var(--step)),calc(100svh - var(--h,0px) - 12px));display:grid;background:var(--card);border-radius:var(--r);overflow:hidden;transform-origin:50% 0;transform:scale(calc(1 - var(--c,0) * .045));will-change:transform}
 .card .txt{display:flex;flex-direction:column;gap:22px;padding:clamp(20px,2.4vw,36px)}
 .card .top{display:flex;justify-content:space-between;gap:16px}
@@ -157,7 +165,7 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 .card h3{font-size:var(--h3);font-weight:640;letter-spacing:-.04em;line-height:1}
 /* 2026-11-15 (Werner): a card's name and line are now its case page's headline (bold part, light part, the violet
    full stop), at the size the name had */
-.card h3.big{font-weight:300;letter-spacing:-.04em;line-height:1.04;max-width:16em;font-size:clamp(1.75rem,2.8vw,4rem)}   /* keeps growing past 1440px wide, to 64px (2026-11-16, Werner: "the title on the project cards should be larger on the larger breakpoints"); it stopped at 40px */
+.card h3.big{font-weight:300;letter-spacing:-.04em;line-height:1.04;max-width:none;text-wrap:wrap;font-size:clamp(1.75rem,2.8vw,4rem)}   /* keeps growing past 1440px wide, to 64px (2026-11-16, Werner: "the title on the project cards should be larger on the larger breakpoints"); it stopped at 40px. Then the whole width of the card's text (js/contrast.js fits the size so its lines fill it; it was held to 16em) */
 .card h3 a::after{content:"";position:absolute;inset:0;z-index:1}
 .card .line{font-size:clamp(1.0625rem,1.35vw,1.25rem);line-height:1.3;letter-spacing:-.015em;color:var(--grey);max-width:24em;text-wrap:pretty}
 .card .hd{margin-top:auto}                                               /* 2026-11-14 (Werner): name and line sit right above the list, not under the counter */
@@ -214,6 +222,14 @@ html.lb-open{overflow:hidden}
   .lb img.lb-in{animation:lbzoom .45s var(--out)}
   @keyframes lbfade{from{opacity:0}}
   @keyframes lbzoom{from{opacity:0;transform:scale(.96)}}
+  /* (2026-11-16, motion audit) stepping to the next picture: a short fade from .4, no zoom (with a key, nothing:
+     js leaves the class off); closing: the layer fades and the picture settles, quicker and smaller than the opening */
+  .lb img.lb-step{animation:lbstep .15s ease-out}
+  @keyframes lbstep{from{opacity:.4}}
+  .lb.lb-closing{animation:lbout .18s var(--out) forwards}
+  .lb.lb-closing img{animation:lbsettle .18s var(--out) forwards}
+  @keyframes lbout{to{opacity:0}}
+  @keyframes lbsettle{from{transform:none}to{transform:scale(.97)}}
 }
 
 /* a screen: whole, at its own proportions; several states step through, the caption names them */
@@ -309,7 +325,7 @@ html.lb-open{overflow:hidden}
   .about>h2{margin-bottom:18px}
   .about>.portrait{grid-column:1;grid-row:2 / span 2;width:auto}
   .about>.say{grid-column:2 / span 2;grid-row:2;align-self:end;margin:0;padding-bottom:var(--c);font-size:clamp(1.75rem,3.75vw,6.25rem)}   /* 2026-11-15 (Werner): the statement runs over the bio's column and the facts'; first set large on three lines, then ("change the about headline to 2 lines, and reduce the font size to fill out 2 lines") on two balanced lines, the size at which they fill the two columns (the text is about 33 times the font size wide) */
-  .about>.bio{grid-column:2;grid-row:3;margin:0;font-size:clamp(1.0625rem,1.3vw,1.1875rem);display:flex;flex-direction:column;justify-content:center;min-height:calc(var(--n,5) * var(--c));padding-block:calc(var(--c) * .28);border-block:1px solid var(--line)}
+  .about>.bio{grid-column:2;grid-row:3;margin:0;font-size:clamp(1.0625rem,1.3vw,1.1875rem);display:block;min-height:calc(var(--n,5) * var(--c));padding-block:calc(var(--c) * .28);border-block:1px solid var(--line)}
   .about>.facts{grid-column:3;grid-row:3;margin:0;display:grid;grid-auto-rows:minmax(var(--c),1fr)}   /* as tall as the bio's box (the row), so their rules meet at the top as well as at the foot; each fact at least a square. Five since 2026-11-15 (Leading design): on a laptop the bio's box is five squares, so each fact is one */
   .facts>div{align-items:center;padding-block:0}
   /* 2026-11-15 (Werner: "extend the line, remove the gap between these 2 columns"): the bio's box reaches over the gap
@@ -334,20 +350,40 @@ html.lb-open{overflow:hidden}
    on a phone) and its lines continue the hero's; it is a whole number of squares high, so the pattern is never cut
    through a square. The label above it is the old headline's words. Later that day (Werner): light purple, not
    dark, so the logos are ink and the grid's lines violet. */
-.strip{container-type:inline-size;border-radius:var(--r);background:var(--lav);overflow:hidden}
+.strip{container-type:inline-size;border-radius:var(--r);background:var(--lav);overflow:hidden;view-timeline:--logos}   /* the logos' scroll timeline (below): the strip's way across the window. Named here, on the strip, as the strip and the belt clip (overflow:hidden), which makes each a scroller of its own that an unnamed view() inside them would read */
 .marq{--c:3.125cqw;position:relative;display:grid;align-items:center;height:calc(var(--c) * 4);
   background:repeating-linear-gradient(180deg,rgba(var(--acc),.24) -1px,rgba(var(--acc),.24) 0px,transparent 0px,transparent calc(var(--c) - 1px)),repeating-linear-gradient(90deg,rgba(var(--acc),.24) -1px,rgba(var(--acc),.24) 0px,transparent 0px,transparent calc(var(--c) - 1px))}   /* one repeating gradient, not a tile (2026-11-15): Safari rounds a tile, see css/heroes-c.css */
-@media (max-width:760px){ .marq{--c:6.25cqw} }
+@media (max-width:760px){ .marq{--c:6.25cqw} .marq .track{gap:32px} .marq .track img{height:calc(var(--h) * .7px)} }   /* a phone: smaller logos, closer together, so the row passes at about the pace it does on a wide screen (2026-11-16) */
 @supports (width:round(nearest,1px,1px)){ .marq{height:round(nearest,170px,var(--c))} }
 .belt{overflow:hidden}
-.track{display:flex;align-items:center;width:max-content;animation:marq 46s linear infinite}
-.marq:hover .track{animation-play-state:paused}
-.track img{flex:none;height:calc(var(--h) * 1.15px);width:auto;margin-right:clamp(56px,6.5vw,104px);opacity:.9}   /* the files are ink already (2026-11-15): no filter, which Safari painted blurred in the moving strip */
+/* the logos move with the scroll, not the clock (2026-11-16, motion audit: a 46s loop that ran forever, which only a
+   mouse could pause). Then (Werner: "it doesn't show all logos"; they drifted only a third of the window's width) the
+   whole row passes: the first logo at the left as the strip comes into view, the last at the right as it leaves,
+   once, in alphabetical order, at rest whenever the page is. The row starts and ends one square in from the strip's
+   edges; 100cqw is the strip's width, 100% the row's. Where a browser has no scroll timelines, and with reduced
+   motion, every logo stands still in rows instead (below).
+   Later that day (Werner: "add a bit of delay before scrolling the company bar, right now BASF is already out of view
+   and is one of the bigger clients"): the row now waits until the whole strip is in view and a fifth of the way up
+   the rest of the screen (contain 20%), and finishes before the strip reaches the top, so the last logo is seen in full
+   (contain 85%; it ended as the strip left the screen, Werner: "Wüstenrot is shown a bit too late"). The logos sit a little
+   closer on a wide screen (at most 80px apart, was 104), so the shorter stretch doesn't make them faster */
+.track{display:flex;align-items:center;gap:clamp(56px,4.5vw,80px);width:max-content;padding-inline:var(--c)}
+@supports (animation-timeline:view()){ @media (prefers-reduced-motion:no-preference){ .track{animation:marq linear both;animation-timeline:--logos;animation-range:contain 20% contain 85%} } }
+.track img{flex:none;height:calc(var(--h) * 1.15px);width:auto;opacity:.9}   /* the files are ink already (2026-11-15): no filter, which Safari painted blurred in the moving strip */
 /* each logo is there twice, ink and white (assets/make-logos.mjs), and the page shows the one for its colours */
 .track img.on-dark{display:none}
 :root[data-theme="dark"] .track img.on-light{display:none} :root[data-theme="dark"] .track img.on-dark{display:block}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .track img.on-light{display:none} :root:not([data-theme="light"]) .track img.on-dark{display:block} }
-@keyframes marq{to{transform:translateX(-50%)}}
+@keyframes marq{to{transform:translateX(min(0px,calc(100cqw - 100%)))}}
+/* still: all the logos in rows of cells two squares high, so the strip stays a whole number of squares */
+@supports not (animation-timeline:view()){
+  .marq{height:auto} .belt{overflow:visible}
+  .marq .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(var(--c) * 6),1fr));grid-auto-rows:calc(var(--c) * 2);place-items:center;width:auto;gap:0;padding:var(--c)} .marq .track img{max-height:calc(var(--c) * 1.4);max-width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  .marq{height:auto} .belt{overflow:visible}
+  .marq .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(var(--c) * 6),1fr));grid-auto-rows:calc(var(--c) * 2);place-items:center;width:auto;gap:0;padding:var(--c)} .marq .track img{max-height:calc(var(--c) * 1.4);max-width:100%}
+}
 
 /* ── skills: big rows on hairlines; a row opens on a click (the live site's services, one open at a time) ──
    The row nearest the middle of the screen is lit (js); an open row stays lit. Without scripts every row is dark
@@ -427,7 +463,7 @@ html:not(.js) .svc .tog{display:none}
   .xp .v{margin-top:0}
 }
 @media (min-width:900px){
-  .xp{display:flex;flex-direction:row-reverse;gap:var(--g);margin-inline:calc(-1 * var(--m));padding:0 var(--m);border-left:0;border-top:1px solid var(--line)}
+  .xp{container-type:inline-size;display:flex;flex-direction:row-reverse;gap:var(--g);margin-inline:calc(-1 * var(--m));padding:0 var(--m);border-left:0;border-top:1px solid var(--line)}
   .xp::before{content:"";position:absolute;left:0;top:-1px;width:calc(100% - var(--m));height:1px;background:var(--stop);transform-origin:0 50%}
   .xp::after{left:calc(100% - var(--m));top:-.5px}                     /* on the line's middle: it is drawn at -1px, 1px thick */
   .xp li{flex:1 1 0;min-width:0;padding:26px clamp(0px,1.4vw,24px) 0 0}
@@ -465,7 +501,11 @@ html:not(.js) .svc .tog{display:none}
 .crumb{display:flex;gap:10px;margin-bottom:clamp(20px,2.4vw,32px)} .crumb a{color:var(--ink)}
 /* 2026-11-15 (Werner): a back button on every case page, at the left of the crumb's row; it goes back to the case's
    own card (js: back in the browser's history when the page was opened from the homepage, so the scroll is kept) */
-.ctop{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:clamp(24px,3vw,44px)}
+.ctop{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:clamp(24px,3vw,48px)}
+@supports (width:round(down,1px,1px)){                                     /* the title's surroundings on the 8px grid as well (2026-11-16) */
+  .chero{padding-top:round(nearest,clamp(40px,6vw,88px),8px)}
+  .ctop{margin-bottom:round(nearest,clamp(24px,3vw,48px),8px)}
+}
 .ctop .crumb{margin:0}
 .back{display:inline-flex;align-items:center;gap:12px;color:var(--ink)}
 .back .go{width:40px;height:40px}
@@ -474,13 +514,21 @@ html:not(.js) .svc .tog{display:none}
 .back:hover .go svg{transform:translateX(-2px)}
 @media (max-width:520px){ .ctop .crumb{display:none} }                   /* a phone: the button alone; the nav has Work */
 /* the cover, under the headline: the card's panel, larger, on its own */
-.ccover{min-height:0;margin-top:clamp(36px,4.6vw,72px);border-radius:var(--r);overflow:hidden}
+.ccover{min-height:0;margin-top:clamp(40px,4.6vw,72px);border-radius:var(--r);overflow:hidden}
+@supports (width:round(down,1px,1px)){ .ccover{margin-top:round(nearest,clamp(40px,4.6vw,72px),8px)} }   /* under the title, on the 8px grid (2026-11-16) */
 .ccover .mat{flex:none;aspect-ratio:4 / 3;min-height:0}
 .ccover:has(.bleed){padding:0} .ccover .bleed{border-radius:0}                 /* the zoomed crop fills the panel: the devices rise out of its foot (2026-11-15) */
 @media (min-width:761px){ .ccover .mat{aspect-ratio:2 / 1} }
 .ccover + .spread{margin-top:var(--g)}                                    /* the screens follow at the same gap they keep among themselves (Werner, 2026-11-15) */
 .lead{font-size:clamp(2.5rem,6.2vw,5.75rem);line-height:.94;max-width:14.5em}
-.chero .lead{max-width:none;font-size:clamp(2.5rem,6.2vw,10rem);text-wrap:wrap}   /* a case page's title fills the width (js/contrast.js fits its size, 2026-11-15): its lines run to the edge (not balanced; js turns on pretty only if a word would stand alone on the last line), and its starting size keeps growing on a wide screen, so a title keeps its number of lines at every desktop width */
+/* a case page's title: one size for every case at a given width, on the 8px grid (2026-11-16, Werner: "titles should
+   be unified across all screens and case studies and use the 8px grid system"). It was fitted to fill the width, so
+   each case had its own size (85 to 133px on a 1440px screen), up to 250px on a wide one. Now it grows evenly from
+   32px on a phone to 120px (the homepage headline's largest) at 1920px wide, rounded down to a multiple of 8: 48px at
+   768, 64 at 1024, 80 at 1280, 88 at 1440. The line height is the size itself, so each line is a whole number of
+   8px rows too; the lines are balanced */
+.chero .lead{max-width:none;font-size:clamp(32px,5.75vw + 10px,120px);line-height:1;text-wrap:balance}
+@supports (width:round(down,1px,1px)){ .chero .lead{font-size:round(down,clamp(32px,5.75vw + 10px,120px),8px)} }
 .spread{display:grid;gap:var(--g);margin-top:clamp(36px,4.6vw,72px)}
 .spread .side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--g)}
 .spread .side:has(>:only-child){grid-template-columns:minmax(0,1fr)}
@@ -534,6 +582,13 @@ html:not(.js) .svc .tog{display:none}
 @media (min-width:761px){ .gal{grid-template-columns:repeat(12,minmax(0,1fr))} .gal>*{grid-column:span 6} .gal>.tall{grid-column:span 4} .gal>.wide{grid-column:span 8} .gal>.strip{grid-column:span 12} }
 .gal .tall .mat{aspect-ratio:4 / 5} .gal .strip .mat{aspect-ratio:32 / 7} .gal .mat{aspect-ratio:16 / 10}
 .fine{margin-top:20px;color:var(--grey);font-size:.875rem;max-width:44em}
+/* a case's note under its title (2026-11-16, GALVANY's "work in progress"): the rows' own layout, the label beside the
+   text from a tablet up, on its first line; quieter than the brief, read before the screens. Spacing on the 8px grid */
+.cwip{row-gap:8px;align-items:baseline;margin-top:24px}
+.cwip>*{grid-column:1 / -1}
+.cwip>p:not(.lab){font-size:clamp(1.0625rem,1.3vw,1.25rem);line-height:1.45;color:var(--grey);max-width:40em;text-wrap:pretty}
+@media (min-width:600px){ .cwip>.lab{grid-column:1 / span 4} .cwip>p:not(.lab){grid-column:5 / span 8} }
+@supports (width:round(down,1px,1px)){ .cwip{margin-top:round(nearest,clamp(24px,2.5vw,40px),8px)} }
 .nextp{position:relative;display:grid;gap:clamp(40px,7vw,120px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--night);color:#fff;transition:background .4s var(--out)}
 .nextp:hover{background:#1f1a2e}
 .nextp .mono{color:rgba(255,255,255,.55)}
@@ -545,12 +600,12 @@ html:not(.js) .svc .tog{display:none}
 
 /* ── motion: everything below only runs with scripts on and motion allowed ─ */
 @media (prefers-reduced-motion:no-preference){
-  .js [data-in]{opacity:0;transform:translateY(28px);transition:opacity .9s var(--out) calc(var(--d,0) * 1ms),transform .9s var(--out) calc(var(--d,0) * 1ms)}
+  /* a block comes in whole (2026-11-16, Werner: "make sure all text fades in as a complete paragraph not word for
+     word"; and the motion audit: a 28px rise over .9s on every block slowed reading). Headlines no longer rise word by
+     word: they fade in like any paragraph, and their full stop lands just after */
+  .js [data-in]{opacity:0;transform:translateY(12px);transition:opacity .6s var(--out) calc(var(--d,0) * 1ms),transform .6s var(--out) calc(var(--d,0) * 1ms)}
   .js [data-in].in{opacity:1;transform:none}
-  .js [data-in="rise"]{opacity:1;transform:none}
-  .js [data-in="rise"] .w>span{transform:translateY(112%);transition:transform 1s var(--out) calc(var(--d,0) * 1ms + var(--i) * 55ms)}
-  .js [data-in="rise"].in .w>span{transform:none}
-  .js [data-in="rise"] .stop{transform:scale(0);transition:transform .6s var(--back) calc(var(--d,0) * 1ms + var(--i,3) * 55ms + 520ms)}
+  .js [data-in="rise"] .stop{transform:scale(0);transition:transform .5s var(--back) calc(var(--d,0) * 1ms + 350ms)}
   .js [data-in="rise"].in .stop{transform:none}
   /* a wipe: the tile stays put (so it can be watched), its image rises into it */
   .js [data-in="wipe"]{opacity:1;transform:none}
@@ -569,8 +624,10 @@ html:not(.js) .svc .tog{display:none}
   @media (min-width:900px){
     .js .xp::before{transform:scaleX(0);transition:transform 1.5s var(--out)}
     .js .xp.in::before{transform:none}
-    .js .xp::after{left:var(--m);transform:none;transition:left 1.5s var(--out)}
-    .js .xp.in::after{left:calc(100% - var(--m))}
+    /* the dot runs out by translate, not left (2026-11-16, motion audit): .xp is a size container here, so 100cqw is
+       the line's length between the margins */
+    .js .xp::after{left:var(--m);transform:none;transition:translate 1.5s var(--out)}
+    .js .xp.in::after{translate:100cqw}
   }
   /* 2026-11-15 (Werner): where the list runs down the page it comes in from the top: the dot on now first, then the
      line draws down to the CV button, and each job comes in as the line reaches its tick, newest first (--j: its

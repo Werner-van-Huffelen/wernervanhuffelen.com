@@ -227,7 +227,7 @@
       }
       if (key === last) return;
       last = key;
-      if (!on) light(i, j, s);
+      if (!on && !still) light(i, j, s);                                    /* not with reduced motion (2026-11-16, motion audit: the one light in the hero that ignored it) */
     });
     function rest() {                                                      /* the brush lets go of the portrait */
       last = '';

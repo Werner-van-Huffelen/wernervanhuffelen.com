@@ -115,14 +115,18 @@
     });
   })();
 
-  /* 3. led by the scroll: the nav shrinks, a statement fills in word by word, covered cards step back,
+  /* 3. led by the scroll: the nav shrinks, covered cards step back (the statement that filled in word by word comes in whole since 2026-11-16),
         the service nearest the middle of the screen lights up, the footer name rises */
   var nav = d.querySelector('.nav'), fills = $('[data-fill]'), cards = $('.card'), rows = $('.svc>li'), mark = d.querySelector('.mark');
   var queued = false;
   function frame() {
     queued = false;
     var vh = innerHeight;
-    if (nav) nav.classList.toggle('is-small', scrollY > 120);
+    if (nav) {
+      var small = scrollY > 120;
+      if (!small && nav.classList.contains('is-small')) nav.classList.add('grown');   /* css: the surname fades back in */
+      nav.classList.toggle('is-small', small);
+    }
     fills.forEach(function (el) {
       var r = el.getBoundingClientRect(), ws = el._w || (el._w = $('.w', el));
       var n = reduce ? ws.length : Math.round(clamp((vh * 0.88 - r.top) / (vh * 0.42 + r.height * 0.7)) * ws.length);
@@ -195,9 +199,31 @@
       var n = Math.ceil(bio.offsetHeight / c - 0.02);
       bio.style.alignSelf = ''; bio.style.setProperty('--n', String(n));
     }
-    var later = function () { if (!queued) { queued = true; requestAnimationFrame(snap); } };
-    snap(); addEventListener('resize', later);
-    if (d.fonts && d.fonts.ready) d.fonts.ready.then(snap);
+    /* the bio's first line on the same baseline as the first fact beside it (2026-11-16, Werner: "make sure the body text
+       on the about me section is top aligned with the text on the left of it instead of center aligned"): the value
+       ("Berlin"), or the label above it where a fact stands as two lines (below 1000px). Its top padding takes the
+       difference; the box keeps its whole squares, so the box is snapped again after */
+    var facts = a.querySelector('.facts');
+    function baseline(el) {                                                 /* where its first line sits, without the reveal's offset */
+      var m = d.createElement('span'), host = el.closest('[data-in]'), ty = 0;
+      m.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.insertBefore(m, el.firstChild);
+      var y = m.getBoundingClientRect().top; el.removeChild(m);
+      try { ty = host ? new DOMMatrix(getComputedStyle(host).transform).m42 : 0; } catch (e) { ty = 0; }
+      return y - ty;
+    }
+    function align() {
+      bio.style.paddingTop = '';
+      var row = facts && facts.querySelector('div'), dt = row && row.querySelector('dt'), dd = row && row.querySelector('dd');
+      if (innerWidth < 900 || !dt || !dd) return;
+      var ref = dd.getBoundingClientRect().top >= dt.getBoundingClientRect().bottom - 1 ? dt : dd;   /* stacked: the label is the first line */
+      var pt = parseFloat(getComputedStyle(bio).paddingTop) || 0;
+      bio.style.paddingTop = Math.max(0, pt + baseline(ref) - baseline(bio)).toFixed(2) + 'px';
+    }
+    function layout() { snap(); align(); snap(); align(); }
+    var later = function () { if (!queued) { queued = true; requestAnimationFrame(layout); } };
+    layout(); addEventListener('resize', later);
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(layout);
   });
 
   /* 4. numbers count up to their value */
@@ -226,7 +252,13 @@
      whole line of text would need, spread over that many lines, then a step smaller while it still needs one more.
      The titles differ in length, so each lands at its own size (about 100 to 115px on a 1440px screen); on a phone
      they stay about as they were. Without scripts it is the css size, across the whole width */
-  $('.chero .lead').forEach(function (h) {
+  /* the cards' titles too (2026-11-16, Werner: "same for the headers on the project cards, they could be slightly bigger
+     and fill up the entire width of the card"): the same fit, with the line count taken at a share of the card's text
+     width (below), and a title that only grows, or shrinks by at most 4% to keep to its lines */
+  /* (2026-11-16, Werner: "titles should be unified across all screens and case studies and use the 8px grid system"):
+     a case page's title is no longer fitted here. The css gives every case the same size at a given width, on the 8px
+     grid (css/contrast.css, .chero .lead). Only the cards' titles are still fitted, each to its card */
+  function fitTitle(h, start) {
     var ws = $('.w', h), queued = false;
     if (!ws.length) return;
     var lines = function () { var t = {}; ws.forEach(function (w) { t[w.offsetTop] = (t[w.offsetTop] || 0) + 1; }); return t; };
@@ -238,10 +270,11 @@
       if (!(cw > 0)) return;
       /* measured at a size that is a share of the width (on a phone a larger one), so a title's length in widths, and
          with it its line count and its breaks, is the same at every width; it does not flip as the window changes */
-      var f0 = cw * (innerWidth < 600 ? 0.112 : 0.07);
+      var f0 = start ? start() : cw * (innerWidth < 600 ? 0.112 : 0.07);
       h.style.fontSize = f0.toFixed(2) + 'px';
-      h.style.whiteSpace = 'nowrap'; var x = h.scrollWidth / cw; h.style.whiteSpace = '';   /* the title's length, in widths */
-      var lo = Math.floor(x), n = lo >= 1 && x / lo <= 1.12 ? lo : lo + 1;                      /* just over a whole number of lines: that many, a little smaller; otherwise one more, larger */
+      h.style.whiteSpace = 'nowrap'; var rg = d.createRange(); rg.selectNodeContents(h); var x = rg.getBoundingClientRect().width / cw; h.style.whiteSpace = '';   /* the title's length, in widths (the text's own, not its box's: a short title is narrower than its box) */
+      var lo = Math.floor(x), n = start ? (lo >= 1 && x / lo <= 1.04 ? lo : Math.max(1, Math.ceil(x)))   /* a card's: grows to fill its lines, or shrinks by at most 4% to keep to them */
+        : (lo >= 1 && x / lo <= 1.12 ? lo : lo + 1);                                             /* a case page's: just over a whole number of lines, that many, a little smaller; otherwise one more, larger */
       var f = f0 * n / x * 0.985;
       h.style.fontSize = f.toFixed(2) + 'px';
       for (var k = 0; k < 24 && rows() > n; k++) { f *= 0.985; h.style.fontSize = f.toFixed(2) + 'px'; }
@@ -251,7 +284,8 @@
     var later = function () { if (!queued) { queued = true; requestAnimationFrame(fit); } };
     fit(); addEventListener('resize', later);
     if (d.fonts && d.fonts.ready) d.fonts.ready.then(fit);
-  });
+  }
+  $('.card h3.big').forEach(function (h) { fitTitle(h, function () { return h.clientWidth * (innerWidth < 600 ? 0.086 : innerWidth < 900 ? 0.04 : 0.085); }); });   /* measured at a share of the card's text width, one per layout (a phone; a tablet, the card stacked and wide; text beside the picture), so a title keeps its line count at every width within one */
 
   /* a case page's back button (2026-11-15): opened from the homepage, it goes back in the history, so the homepage is
      where it was left; otherwise (a link from outside, or from another case) it follows its link to the case's card */
@@ -316,27 +350,40 @@
       (items.length > 1 ? '<button type="button" class="lb-p" aria-label="Previous picture">' + SVG('M20 12H4M11 5l-7 7 7 7') + '</button><button type="button" class="lb-n" aria-label="Next picture">' + SVG('M4 12h16M13 5l7 7-7 7') + '</button>' : '');
     d.body.appendChild(box);
     var im = box.querySelector('img'), fc = box.querySelector('figcaption'), count = function (k) { return items.length > 1 ? (k + 1) + ' / ' + items.length : ''; };
-    function show(k) {
+    /* how: 'open' zooms the picture in; a step by button fades it briefly; a step by key swaps it at once (2026-11-16,
+       motion audit: every step replayed the opening's .45s zoom, keys included) */
+    function show(k, how) {
       cur = (k + items.length) % items.length;
       var t = items[cur], thumb = t.img.currentSrc || '';
-      im.classList.remove('lb-in'); void im.offsetWidth; im.classList.add('lb-in');
+      im.classList.remove('lb-in', 'lb-step');
+      if (how !== 'key') { void im.offsetWidth; im.classList.add(how === 'open' ? 'lb-in' : 'lb-step'); }
       im.src = thumb || t.full; im.alt = t.alt; im.style.background = t.bg || ''; im.classList.toggle('pad', !!t.bg);   /* a cut-out on its panel's colour */
       fc.textContent = [t.cap, count(cur)].filter(Boolean).join('   ');
       if (thumb && thumb.indexOf(t.full) < 0) { var f = new Image(); f.onload = function () { if (items[cur] === t) im.src = t.full; }; f.src = t.full; }
       var p = items[(cur + 1) % items.length]; if (p) { var q = new Image(); q.src = p.full; }   /* the next one, ready */
     }
-    function open(k) { last = d.activeElement; d.documentElement.classList.add('lb-open'); if (!box.open) box.showModal(); show(k); }
-    function close() { if (box.open) box.close(); }
+    function open(k) { last = d.activeElement; d.documentElement.classList.add('lb-open'); if (!box.open) box.showModal(); show(k, 'open'); }
+    /* closing fades the layer out first (css: .lb-closing, .18s), then closes the dialog (2026-11-16, motion audit: it
+       vanished in one frame). The timer closes it should the animation not run */
+    function close() {
+      if (!box.open || box.classList.contains('lb-closing')) return;
+      if (reduce) { box.close(); return; }
+      var t = 0, end = function (e) { if (!e || e.target === box) done(); };
+      var done = function () { clearTimeout(t); box.removeEventListener('animationend', end); box.classList.remove('lb-closing'); if (box.open) box.close(); };
+      box.classList.add('lb-closing');
+      box.addEventListener('animationend', end);
+      t = setTimeout(done, 320);
+    }
     box.addEventListener('close', function () { d.documentElement.classList.remove('lb-open'); im.removeAttribute('src'); if (last && last.focus) last.focus(); });
     box.addEventListener('click', function (e) {
       var b = e.target.closest('button');
-      if (b && b.classList.contains('lb-p')) show(cur - 1);
-      else if (b && b.classList.contains('lb-n')) show(cur + 1);
+      if (b && b.classList.contains('lb-p')) show(cur - 1, e.detail ? 'button' : 'key');   /* a button pressed with Enter or Space is a key */
+      else if (b && b.classList.contains('lb-n')) show(cur + 1, e.detail ? 'button' : 'key');
       else if (b || e.target !== im) close();
     });
     box.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') { e.preventDefault(); show(cur + 1); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); show(cur - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(cur + 1, 'key'); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); show(cur - 1, 'key'); }
       else if (e.key === 'Escape') { e.preventDefault(); close(); }          /* the dialog's own Esc, made sure of */
     });
     /* each picture's frame becomes the button; a stepping screen opens on the state it shows */
@@ -363,6 +410,8 @@
     try { fine = matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) { /* no hover */ }
     if (reduce || !fine) return;
     var BASE = 1000, TURN = 650;                                            /* the picture's own width in px, and ms for a whole turn */
+    var scrolled = 0;                                                       /* when the page last scrolled (see the cards' pointermove) */
+    addEventListener('scroll', function () { scrolled = Date.now(); }, { passive: true });
     function hom(w, h, quad) {                                              /* the rectangle w by h onto the quad TL, TR, BR, BL */
       var src = [[0, 0], [w, 0], [w, h], [0, h]], A = [], B = [], c, r, k, p, f, t;
       for (k = 0; k < 4; k++) { var x = src[k][0], y = src[k][1], u = quad[k][0], v = quad[k][1]; A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); B.push(u); A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); B.push(v); }
@@ -413,8 +462,16 @@
         goal = g;
         if (!raf && k !== goal) raf = requestAnimationFrame(step);
       }
-      card.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') to(1); });
-      card.addEventListener('pointerleave', function () { to(0); });
+      /* only when the mouse is meant to be there (2026-11-16, motion audit: with the mouse resting on the page, each card
+         that scrolled under it turned its screen). The pointer has to move inside the card (the browser's own move,
+         sent when the page scrolls under a still pointer, has no movement) and rest there 120ms, with no scrolling
+         in the last 200ms. Leaving the card turns it back, as before */
+      var wait = 0;
+      card.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse' || goal === 1 || wait || (!e.movementX && !e.movementY) || Date.now() - scrolled < 200) return;
+        wait = setTimeout(function () { wait = 0; if (card.matches(':hover') && Date.now() - scrolled >= 200) to(1); }, 120);
+      });
+      card.addEventListener('pointerleave', function () { clearTimeout(wait); wait = 0; to(0); });
       addEventListener('resize', function () { if (k && els.length) draw(); });
       mat._turn = function (v) { make(); goal = k = v; draw(); };       /* a still at any point of the turn (for checking it) */
     });
