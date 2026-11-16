@@ -181,7 +181,7 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 @media (max-width:899px){ .card .panel{order:-1} }
 @media (min-width:900px){
   .stack{--top:84px;--step:14px}
-  .card{grid-template-columns:5fr 7fr;min-height:min(640px,calc(100vh - 176px))}
+  .card{grid-template-columns:5fr 7fr;min-height:80vh;min-height:80svh}   /* 80% of the window's height (2026-11-16, Werner: "set the project cards to 80% vh"); it was at most 640px */
 }
 
 /* the laptop screens that turn to face you on a card (js/contrast.js, 2026-11-15): each a picture of the screen, laid
@@ -442,6 +442,12 @@ html:not(.js) .svc .tog{display:none}
 .cta .row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
 .cta .pill:hover{background:#fff;color:var(--ink)} .cta .pill:hover .arr{background:var(--ink);color:#fff}
 .cta .ln{text-decoration-color:rgba(21,17,31,.4)}
+/* secondary buttons (2026-11-16, Werner: "make the CV and the other contact links secondary buttons"): the same pill as
+   the email's, outlined, its arrow without the circle; under the pointer they fill white, as the email's does */
+.cta .row{gap:10px}
+.cta .pill.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(21,17,31,.45);padding:0 14px 0 18px;transition:background .25s var(--out),box-shadow .25s var(--out)}
+.cta .pill.ghost .arr{width:auto;height:auto;background:none;color:inherit}
+.cta .pill.ghost:hover{background:#fff;box-shadow:inset 0 0 0 1px #fff}
 
 /* ── footer: the name, cut off by the edge ──────────────────────────────── */
 .foot{padding:clamp(40px,5vw,72px) var(--m) 0;overflow:hidden}

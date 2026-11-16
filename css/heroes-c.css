@@ -47,7 +47,7 @@
    square, which leaves the sentence and its two squares where they are. It no longer meets a vertical line as well:
    that took nudging the size, which made it jump as the window widened instead of growing evenly */
 .cx-1 h1{font-size:clamp(40px,calc(5vw + 24px),120px)}
-.cx-1 .lead-in .lede{font-size:clamp(20px,calc(.75vw + 17.6px),32px)}   /* at most 32px (Werner, 2026-11-16: "reduce max font size for the subheader on the hero to 32px instead of 40px"), still growing evenly from 20px at 320px wide to 32px at 1920 */
+.cx-1 .lead-in .lede{font-size:clamp(20px,calc((5vw + 24px) * .27),32px);max-width:16.4em;text-wrap:balance}   /* 2026-11-16 (Werner: at most 32px; then "make sure the subheader on the hero sits on 3 lines and is max 120% width of the hero title"). The title is 3.69 of its own size wide and the sentence 46.7 of its own size long, so the sentence is .27 of the title's size (the title's own 5vw + 24px) in a column of 16.4em: 1.2 titles wide, three balanced lines. Below about 1000px wide that would be under 20px, so it holds at 20px in the same 16.4em (330px), still three lines; and at most 32px from 1920 */
 .cx-1 .lead-in{align-self:end;padding-bottom:calc(var(--c) * 2)}
 .cx .under{grid-template-columns:minmax(0,1fr);padding-top:18px}
 /* 2026-11-15 (Werner): the note under the timeline ("Getting sh*t done since 2015") moved to the Experience header.
@@ -98,7 +98,7 @@
 .cx-1 .who{display:none}
 @media (min-width:900px){
   .cx-1 .who{display:block;position:absolute;z-index:-1;left:calc(var(--m) + var(--c) * 24);bottom:calc(100% + 1px);width:calc(var(--c) * 12);aspect-ratio:1;transform:translateX(-50%);pointer-events:none}
-  @supports (width:round(down,1px,1px)){ .cx-1 .who{width:round(down,min(calc(var(--c) * 16),calc(100svh - 250px),720px),calc(var(--c) * 2))} }
+  @supports (width:round(down,1px,1px)){ .cx-1 .who{width:round(down,min(calc(var(--c) * 16),calc(100svh - 250px),900px),calc(var(--c) * 2))} }   /* at most 900px (2026-11-16, Werner: "the size of the profile picture could be slightly bigger on the largest screen sizes"); it was 720, so a 2560 screen had it at 600 */
 }
 @media (max-width:899px) and (prefers-reduced-motion:no-preference){
   .js .cx-1 .who{--w:calc(var(--c) * 16);display:block;position:absolute;z-index:-1;bottom:calc(100% + 1px);width:var(--w);aspect-ratio:1;pointer-events:none;
