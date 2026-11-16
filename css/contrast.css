@@ -5,7 +5,7 @@
    big numerals, flat colour grounds behind the images. From loopsii.com: soft grey paper, construction lines,
    a pill nav that shrinks, cards that stack as you scroll, a dark panel with a diagonal headline, wide spacing.
    His own: the copy, the violet, and the full stop, which here also marks every crossing of two lines.
-   Display type is Inter Tight from Google Fonts (linked for the concept; host it yourself if this ships).
+   Headlines in Funnel Display (Google Fonts); text in Saans and labels in Saans Mono since 2026-11-16 (below).
    ========================================================================== */
 
 @font-face{font-family:"Fragment Mono";font-style:normal;font-weight:400;font-display:swap;src:url(../assets/fonts/fragment-mono-latin.woff2) format("woff2")}
@@ -103,6 +103,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
    past the screen's edge, 42px at 320 (2026-11-15). Below 375px About goes from the nav (it is one scroll down) and the
    gaps close a little */
 @media (max-width:374px){ .nav .links a[href$="#about"]{display:none} .nav{gap:8px} .nav .mode{margin-left:0} }
+@media (min-width:375px) and (max-width:389px){ .nav{gap:10px} .nav .links a{padding-inline:6px} }   /* 375 to 389px (2026-11-16, Werner: "fix the nav overflow at 375px"): Work and About still fit, a little closer together; the nav ran 10px wider than its pill in Saans (4px in Inter Tight) */
 /* the switch itself (js/contrast.js): the hero's wave. The new colours arrive square by square on the hero's grid,
    from the button outwards, and a band of lit squares runs with the front and fades behind it (.tw, a canvas over the
    page that the transition shows live). Nothing else moves on its own during it (the covers' names belong to the
@@ -180,6 +181,23 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 .card:hover .go{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .panel{position:relative;display:flex;flex-direction:column;min-height:300px;padding:clamp(16px,2vw,28px);background:var(--tint,var(--mat))}
 .panel.night{background:var(--night);color:#fff}
+/* a card's screenshot (build.mjs, cardShot; 2026-11-16, Werner: "keep one screenshot per project, make sure you see the
+   entire screen, on hover it should grow from top left so you zoom in", and before that "crisp on any screensize").
+   The whole screen in the middle of the panel. On hover it grows by --zs from its own top left corner, running off
+   the panel. --w, --h: the file's own pixels; it is never drawn larger than it is sharp, zoomed included: at rest at
+   most its pixels over --zs (halved again on a high-density screen), so at --zs it is at most one pixel of the file per
+   pixel of the screen. A cut-out (.bare, Bandcamp's two panels) has no frame or shadow of its own */
+.cshot{position:absolute;inset:0;overflow:hidden;--pad:clamp(20px,4vw,56px);--zs:1.35;--cap:calc(var(--w) * 1px / 2 / var(--zs));--caph:calc(var(--h) * 1px / 2 / var(--zs))}
+@media (max-resolution:1.4dppx){ .cshot{--cap:calc(var(--w) * 1px / var(--zs));--caph:calc(var(--h) * 1px / var(--zs))} }
+.cshot img{position:absolute;inset:0;margin:auto;width:auto;height:auto;max-width:min(calc(100% - 2 * var(--pad)),var(--cap));max-height:min(calc(100% - 2 * var(--pad)),var(--caph));border-radius:10px;box-shadow:0 0 0 1px rgba(var(--sh),.08),0 30px 60px -30px rgba(var(--sh),.4);transform-origin:0 50%}
+.cshot.bare img{border-radius:0;box-shadow:none;transform-origin:50% 50%}   /* Bandcamp's two panels grow from their middle; a screen grows from its left edge, staying centred (Werner, 2026-11-16) */
+/* only the picture takes the pointer, above the card's link layer (h3 a::after) */
+.cshot{pointer-events:none} .cshot img{z-index:2;pointer-events:auto}
+@media (prefers-reduced-motion:no-preference){
+  .js .cshot img{transition:opacity .9s var(--out),transform .9s var(--out)}
+  .js .cshot:not(.in) img{opacity:0;transform:translateY(24px)}
+  @media (hover:hover) and (pointer:fine){ .cshot.in img:hover{transform:scale(var(--zs))} }
+}
 /* 2026-11-14: a card's picture sits on its flat ground. It had the page's grid behind it for a while (Werner, then: "add
    the grid behind the images on the case study cards"), and he took it out again. The tints (.lav, .mat, .night) stay */
 .panel .cell{flex:1;display:flex;flex-direction:column;min-height:0}
@@ -557,7 +575,7 @@ html:not(.js) .svc .tog{display:none}
   .cells>div:nth-child(n+3){border-top:1px solid var(--line)}
   .cells .pin{display:none}
 }
-@media (min-width:761px){ .cells{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)} }   /* one equal column per fact, so they spread over the whole width (2026-11-15, Werner: "spread these evenly on the width of the page, for all these strips, except mobile"); it was four columns, which left a quarter empty where a case has three facts */
+@media (min-width:761px){ .cells{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)} .cells>div:first-child{padding-left:16px;border-left:1px solid var(--line)} }   /* the first fact gets its rule too, on its pin, like the others (2026-11-16, Werner: "make sure there is also a vertical divider before the company (like role and year)") */   /* one equal column per fact, so they spread over the whole width (2026-11-15, Werner: "spread these evenly on the width of the page, for all these strips, except mobile"); it was four columns, which left a quarter empty where a case has three facts */
 .told{row-gap:10px;padding-top:clamp(56px,7vw,112px)}
 .told>*{grid-column:1 / -1}
 .told p{font-size:clamp(1.375rem,2.5vw,2.25rem);line-height:1.14;letter-spacing:-.03em;max-width:25em;text-wrap:pretty}
@@ -584,11 +602,10 @@ html:not(.js) .svc .tog{display:none}
 .fine{margin-top:20px;color:var(--grey);font-size:.875rem;max-width:44em}
 /* a case's note under its title (2026-11-16, GALVANY's "work in progress"): the rows' own layout, the label beside the
    text from a tablet up, on its first line; quieter than the brief, read before the screens. Spacing on the 8px grid */
-.cwip{row-gap:8px;align-items:baseline;margin-top:24px}
+.cwip{row-gap:8px;align-items:baseline;padding-top:clamp(56px,7vw,112px)}   /* between the project's details and the brief since 2026-11-16, at the rows' own spacing */
 .cwip>*{grid-column:1 / -1}
 .cwip>p:not(.lab){font-size:clamp(1.0625rem,1.3vw,1.25rem);line-height:1.45;color:var(--grey);max-width:40em;text-wrap:pretty}
 @media (min-width:600px){ .cwip>.lab{grid-column:1 / span 4} .cwip>p:not(.lab){grid-column:5 / span 8} }
-@supports (width:round(down,1px,1px)){ .cwip{margin-top:round(nearest,clamp(24px,2.5vw,40px),8px)} }
 .nextp{position:relative;display:grid;gap:clamp(40px,7vw,120px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--night);color:#fff;transition:background .4s var(--out)}
 .nextp:hover{background:#1f1a2e}
 .nextp .mono{color:rgba(255,255,255,.55)}

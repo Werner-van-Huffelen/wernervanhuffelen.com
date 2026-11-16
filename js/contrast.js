@@ -313,6 +313,7 @@
       frames.forEach(function (f, j) { f.classList.toggle('is-on', j === i); });
       picks.forEach(function (b, j) { b.setAttribute('aria-pressed', String(j === i)); });
       if (step) step.textContent = (i + 1) + ' / ' + frames.length;
+      alignCap(el);
     }
     function tick() { var img = frames[(i + 1) % frames.length].querySelector('img'); if (!img || img.complete) show(i + 1); }
     function stop() { clearTimeout(timer); timer = 0; }
@@ -325,6 +326,26 @@
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { seen = es[es.length - 1].isIntersecting; if (seen) play(); else stop(); }, { threshold: 0.4 }).observe(el);
     d.addEventListener('visibilitychange', function () { if (d.hidden) stop(); else play(); });
   });
+
+  /* a screen's caption starts where the screen does (2026-11-16, Werner, a screenshot of Affinidi's More screens: "the
+     text should be aligned with the screens/images"). A screen sits in the middle of its frame, which has a fixed
+     shape, so a narrower one starts further in than the frame; the caption takes that difference as its left padding.
+     Measured on the screen that shows (a stepping one changes it), when it has loaded and when the window changes */
+  function alignCap(fig) {
+    var cap = fig.querySelector('.cap'), img = fig.querySelector('.frame.is-on img') || fig.querySelector('.frame img');
+    if (!cap || !img || !img.offsetWidth || !cap.offsetWidth) return;   /* not a hidden caption (the decisions') */
+    cap.style.paddingLeft = '';
+    var dx = img.getBoundingClientRect().left - cap.getBoundingClientRect().left;
+    if (dx > 0.5) cap.style.paddingLeft = dx.toFixed(1) + 'px';
+  }
+  var caps = $('figure.shot').filter(function (f) { return f.querySelector('.cap') && f.querySelector('.frame img'); });
+  caps.forEach(function (f) {
+    alignCap(f);
+    $('.frame img', f).forEach(function (im) { if (!im.complete) im.addEventListener('load', function () { alignCap(f); }); });
+  });
+  var capQueued = false;
+  addEventListener('resize', function () { if (capQueued) return; capQueued = true; requestAnimationFrame(function () { capQueued = false; caps.forEach(alignCap); }); });
+  if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { caps.forEach(alignCap); });
 
   /* A case page's pictures open large (2026-11-15, Werner: "enlarge the images on the case study pages when you click
      on them, lightbox type view"). Every screen on the page (the cover, the screens up top, the decisions' pictures,
