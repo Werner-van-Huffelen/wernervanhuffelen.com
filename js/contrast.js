@@ -160,15 +160,19 @@
         does not close it, so text being read does not vanish. A tap opens or closes a row as before, and so does the
         keyboard. A mouse click only opens: it does not undo what the hover has just done. While rows are moving (the
         others slide as one closes and one opens) the pointer is ignored, so they cannot set one another off. */
-  var canHover = false, quiet = 0;
+  /* (2026-11-16, Werner: "increase the speed on the skills section hover interaction, it doesn't expand instantly on
+     hover"): the rest before a row opens is 60ms (was 140), the rows move in .3s (css; was .6s) and the pointer is ignored
+     for that long (was .75s); when that time is up, the row under a resting pointer opens without waiting for it to move */
+  var canHover = false, quiet = 0, REST = 60, QUIET = 320, after = 0;
   try { canHover = matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) { /* touch only */ }
   function openRow(li, open) {
     rows.forEach(function (o) {
       var on = o === li && open, h = o.querySelector('.head');
       o.classList.toggle('is-open', on); if (h) h.setAttribute('aria-expanded', String(on));
     });
-    quiet = Date.now() + 750;
+    quiet = Date.now() + QUIET;
     frame();
+    if (canHover) { clearTimeout(after); after = setTimeout(function () { var o = rows.filter(function (x) { return x.matches(':hover'); })[0]; if (o && !o.classList.contains('is-open')) openRow(o, true); }, QUIET + 10); }
   }
   rows.forEach(function (li) {
     var b = li.querySelector('.head'), wait = 0;
@@ -180,7 +184,7 @@
     if (!canHover) return;
     li.addEventListener('pointermove', function (e) {
       if (e.pointerType !== 'mouse' || wait || li.classList.contains('is-open') || Date.now() < quiet) return;
-      wait = setTimeout(function () { wait = 0; if (Date.now() >= quiet && li.matches(':hover')) openRow(li, true); }, 140);
+      wait = setTimeout(function () { wait = 0; if (Date.now() >= quiet && li.matches(':hover')) openRow(li, true); }, REST);
     });
     li.addEventListener('pointerleave', function () { clearTimeout(wait); wait = 0; });
   });

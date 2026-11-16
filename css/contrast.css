@@ -422,16 +422,16 @@ html.lb-open{overflow:hidden}
 .svc>li.is-lit .k,.svc>li.is-open .k{font-weight:640}
 .svc .n,.svc .v{color:inherit}
 .svc .tog{grid-column:2;grid-row:1 / span 3;position:relative;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--ink);transition:background .25s var(--out),border-color .25s var(--out),color .25s var(--out),transform .5s var(--out)}
-.svc .tog i{position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px -7px;border-radius:1px;background:currentColor;transition:transform .5s var(--out)}
+.svc .tog i{position:absolute;left:50%;top:50%;width:14px;height:2px;margin:-1px -7px;border-radius:1px;background:currentColor;transition:transform .3s var(--out)}
 .svc .tog i:last-child{transform:rotate(90deg)}
 .svc .head:hover .tog,.svc>li.is-open .tog{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .svc>li.is-open .tog i:last-child{transform:none}
 html:not(.js) .svc .tog{display:none}
 .svc .more{display:grid;grid-template-rows:1fr}
-.js .svc .more{grid-template-rows:0fr;transition:grid-template-rows .6s var(--out)}
+.js .svc .more{grid-template-rows:0fr;transition:grid-template-rows .3s var(--out)}   /* .3s (was .6s, 2026-11-16, Werner: "it doesn't expand instantly on hover"); js/contrast.js ignores the pointer as long */
 .js .svc>li.is-open .more{grid-template-rows:1fr}
 .svc .more>.in{min-height:0;overflow:hidden}
-.js .svc .more>.in{visibility:hidden;transition:visibility 0s .6s}
+.js .svc .more>.in{visibility:hidden;transition:visibility 0s .3s}
 .js .svc>li.is-open .more>.in{visibility:visible;transition-delay:0s}
 .svc .body{display:grid;gap:clamp(20px,2.2vw,30px) var(--g);padding-block:6px clamp(26px,3vw,44px);color:var(--ink)}
 .svc .txt{display:grid;gap:.8em;font-size:clamp(1.0625rem,1.3vw,1.1875rem);line-height:1.42;max-width:33em;text-wrap:pretty}
