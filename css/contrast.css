@@ -65,7 +65,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
    still Inter): every headline, the Skills titles, Experience's company names, the case pages' decisions and big numbers.
    The text stays Inter Tight */
 .big .b,.big b{font-weight:640}
-.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.14em;margin-bottom:-.14em}
+.w{display:inline-block;vertical-align:top}   /* a word: its own box (the fits measure lines by it), no longer a mask. It clipped (overflow:hidden) for the word-by-word rise, and cut off what reaches past a word: the last letter under the tight tracking, a deep descender (2026-11-16, Werner: "on certain headers some letters are cut off ... like the s and y"); the rise is gone, so is the clip */
 .w>span{display:inline-block}
 
 /* buttons: a pill and its arrow */
@@ -189,6 +189,12 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
    pixel of the screen. A cut-out (.bare, Bandcamp's two panels) has no frame or shadow of its own */
 .cshot{position:absolute;inset:0;overflow:hidden;--pad:clamp(20px,4vw,56px);--zs:1.35;--cap:calc(var(--w) * 1px / 2 / var(--zs));--caph:calc(var(--h) * 1px / 2 / var(--zs))}
 @media (max-resolution:1.4dppx){ .cshot{--cap:calc(var(--w) * 1px / var(--zs));--caph:calc(var(--h) * 1px / var(--zs))} }
+/* a large screen zooms a screenshot less (2026-11-16, Werner: "on large screens the galvany and climatepartner project card
+   hero images zoom in too much"): the picture is already large there, so a third more ran far off the card. The
+   screens (not the cut-outs, which grow from their middle) grow by a fifth from 1600px wide, by an eighth from 2200px.
+   The caps follow --zs, so a picture is as sharp zoomed as before */
+@media (min-width:1600px){ .cshot:not(.bare){--zs:1.2} }
+@media (min-width:2200px){ .cshot:not(.bare){--zs:1.12} }
 .cshot img{position:absolute;inset:0;margin:auto;width:auto;height:auto;max-width:min(calc(100% - 2 * var(--pad)),var(--cap));max-height:min(calc(100% - 2 * var(--pad)),var(--caph));border-radius:10px;box-shadow:0 0 0 1px rgba(var(--sh),.08),0 30px 60px -30px rgba(var(--sh),.4);transform-origin:0 50%}
 .cshot.bare img{border-radius:0;box-shadow:none;transform-origin:50% 50%}   /* Bandcamp's two panels grow from their middle; a screen grows from its left edge, staying centred (Werner, 2026-11-16) */
 /* only the picture takes the pointer, above the card's link layer (h3 a::after) */
