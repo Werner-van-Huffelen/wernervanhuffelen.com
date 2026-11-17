@@ -205,7 +205,7 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
    column is wide enough (on a phone and in the 900 to 1099px band, where it is not, it stays one list), in two columns of three */
 .card .tags{display:grid;gap:0 clamp(16px,2vw,28px)}
 @media (max-width:519px){ .card .tags li:nth-child(n+4){display:none} }   /* 2026-11-15 (Werner: the cards too big on a phone): there, a card shows its first three tags; the case page has them all */
-@media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags:not(.few){grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:0} .card .tags:not(.few) li:nth-child(n+4){padding-left:clamp(16px,2vw,28px)} }   /* 2026-11-15 (Werner): the rules run on across the two columns; the space between them is now the second column's own */
+@media (min-width:520px) and (max-width:899px),(min-width:1100px){ .card .tags{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:repeat(3,auto);grid-auto-flow:column;column-gap:0} .card .tags li:nth-child(n+4){padding-left:clamp(16px,2vw,28px)} .card .tags.few{grid-template-rows:repeat(2,auto)} .card .tags.few li:nth-child(n+3){padding-left:clamp(16px,2vw,28px)} }   /* every card's tags in the same two columns since 2026-11-17 (a card with three, Bandcamp, had one column across the card, its own text edge: two and one now) */   /* 2026-11-15 (Werner): the rules run on across the two columns; the space between them is now the second column's own */
 .card .foot-row{display:flex;align-items:center;justify-content:space-between}
 .card:hover .go{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
 .panel{position:relative;display:flex;flex-direction:column;min-height:300px;padding:clamp(16px,2vw,28px);background:var(--tint,var(--mat))}
@@ -397,10 +397,10 @@ html.lb-open{overflow:hidden}
    height evenly, so they sit on the grid's lines where the height is a multiple of four squares (or each fact is a
    whole number of them) and in between the lines otherwise. */
 @media (min-width:900px){
-  .about{--ag:round(nearest,clamp(24px,4vw,64px),8px);grid-template-columns:3fr 4fr 3fr;grid-template-rows:auto 1fr auto;column-gap:var(--ag);row-gap:0}   /* the statement's row is the flexible one: whatever the portrait's square asks for beyond the bio's row goes there, so the bio's row stays whole squares */
+  .about{--ag:round(nearest,clamp(24px,4vw,64px),8px);grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:auto 1fr auto;column-gap:var(--g);row-gap:0}   /* the statement's row is the flexible one: whatever the portrait's square asks for beyond the bio's row goes there, so the bio's row stays whole squares */
   .about>h2{margin-bottom:16px}
-  .about>.portrait{grid-column:1;grid-row:2 / span 2;width:auto}
-  .about>.say{grid-column:2 / span 2;grid-row:2;align-self:end;margin:0;padding-bottom:var(--c);font-size:var(--h2)}   /* 2026-11-15 (Werner): the statement runs over the bio's column and the facts'; first set large on three lines, then ("change the about headline to 2 lines, and reduce the font size to fill out 2 lines") on two balanced lines, the size at which they fill the two columns (the text is about 33 times the font size wide) */
+  .about>.portrait{grid-column:1 / span 3;grid-row:2 / span 2;width:auto}
+  .about>.say{grid-column:4 / -1;grid-row:2;align-self:end;margin:0;padding-bottom:var(--c);font-size:var(--h2)}   /* 2026-11-15 (Werner): the statement runs over the bio's column and the facts'; first set large on three lines, then ("change the about headline to 2 lines, and reduce the font size to fill out 2 lines") on two balanced lines, the size at which they fill the two columns (the text is about 33 times the font size wide) */
   .about>.bio{grid-column:2;grid-row:3;margin:0;font-size:var(--fs-body);display:block;min-height:calc(var(--n,5) * var(--c));padding-block:round(nearest,calc(var(--c) * .28),4px);border-block:1px solid var(--line)}
   .about>.facts{grid-column:3;grid-row:3;margin:0;display:grid;grid-auto-rows:minmax(var(--c),1fr)}   /* as tall as the bio's box (the row), so their rules meet at the top as well as at the foot; each fact at least a square. Five since 2026-11-15 (Leading design): on a laptop the bio's box is five squares, so each fact is one */
   .facts>div{align-items:center;padding-block:0}
@@ -409,12 +409,19 @@ html.lb-open{overflow:hidden}
   .about>.bio{margin-right:calc(-1 * var(--ag));padding-right:var(--ag)}
   /* 2026-11-15 (Werner: "swap the 2 columns to see how that looks"), a trial: the facts beside the portrait, the bio at
      the right, each column keeping its width (3 : 3 : 4); the bio's box now reaches over the gap to its left */
-  .about{grid-template-columns:3fr 3fr 4fr}
-  .about>.facts{grid-column:2}
-  .about>.bio{grid-column:3;margin-right:0;padding-right:0;margin-left:calc(-1 * var(--ag));padding-left:var(--ag)}
+  /* 2026-11-17 (Werner, from Juno's brief: "reduce distinct left text edges in the main column to 4 or fewer by
+     auditing container/indent values and consolidating to a shared set"): About on the page's 12 columns, as the
+     timeline is. Portrait 1 to 3, facts 4 to 6, bio 7 to 12, the statement over 4 to 12, so its text starts on the
+     timeline's own edges (columns 1, 4, 7 and 10). The facts now reach over the gutter to the bio (it was the other
+     way round), so the bio's box starts on column 7 and the rules still run on as one line; the bio has 6 columns,
+     about 63 characters a line. It was 3 : 3 : 4 with its own gap */
+  .about>.facts{grid-column:4 / span 3;margin-right:calc(-1 * var(--g))}
+  .about .facts>div{padding-right:var(--g)}
+  .about>.bio{grid-column:7 / -1;margin:0;padding-inline:0}
 }
-/* a narrower facts column (under about 250px: below 1000px): the label above its value, which then has the whole column */
-@media (min-width:900px) and (max-width:999px){
+/* a narrower facts column: the label above its value, which then has the whole column. Below 1000px at first; below 1280px
+   since the facts have 3 of the 12 columns (2026-11-17): under about 270px, "The Netherlands" wrapped beside its label */
+@media (min-width:900px) and (max-width:1279px){
   .about>.facts{grid-auto-rows:minmax(calc(var(--c) * 2),1fr)}
   .facts>div{flex-direction:column;justify-content:center;gap:2px;align-items:flex-start}
   .facts dd{text-align:left}
