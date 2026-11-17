@@ -224,14 +224,15 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
    The caps follow --zs, so a picture is as sharp zoomed as before */
 @media (min-width:1600px){ .cshot:not(.bare){--zs:1.2} }
 @media (min-width:2200px){ .cshot:not(.bare){--zs:1.12} }
-.cshot img{position:absolute;left:50%;top:50%;translate:-50% -50%;width:auto;height:auto;max-width:min(calc(100% - 2 * var(--pad)),var(--cap));max-height:min(calc(100% - 2 * var(--pad)),var(--caph));border-radius:10px;box-shadow:0 0 0 1px rgba(var(--sh),.08),0 30px 60px -30px rgba(var(--sh),.4);transform-origin:0 50%}
+.cshot img{position:absolute;left:50%;top:50%;translate:-50% -50%;width:auto;height:auto;max-width:min(calc((100% - 2 * var(--pad)) * var(--fit,1)),var(--cap));max-height:min(calc((100% - 2 * var(--pad)) * var(--fit,1)),var(--caph));border-radius:10px;box-shadow:0 0 0 1px rgba(var(--sh),.08),0 30px 60px -30px rgba(var(--sh),.4);transform-origin:0 50%}
 .cshot.bare img{border-radius:0;box-shadow:none;transform-origin:50% 50%}   /* Bandcamp's two panels grow from their middle; a screen grows from its left edge, staying centred (Werner, 2026-11-16) */
 @media (max-width:899px){ .cshot img{transform-origin:50% 50%} }   /* where the picture sits above the text, every picture grows from its middle (2026-11-16, Werner: "on breakpoints where the image on the project cards sits above the text, ... grow from the center instead of top left") */
 /* the Bandcamp card's reel (2026-11-16, Werner: "add this product reel on the bandcamp player project card instead of
    the image"): the video lies on its still, in the same box (the still's sizing, in the .cshot's own units), and shows
    once it plays; it comes in and zooms with the still, from the same point (js/contrast.js loads and plays it) */
 .cshot.reel{container-type:size}
-.cshot video{position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:3;width:min(calc(100cqw - 2 * var(--pad)),var(--cap),calc((100cqh - 2 * var(--pad)) * var(--w) / var(--h)));height:auto;aspect-ratio:var(--w) / var(--h);border-radius:10px;object-fit:cover;pointer-events:none;opacity:0;transform-origin:0 50%;transition:opacity .4s var(--out),transform .4s var(--out)}
+.cshot video{position:absolute;left:50%;top:50%;translate:-50% -50%;z-index:3;width:min(calc((100cqw - 2 * var(--pad)) * var(--fit,1)),var(--cap),calc((100cqh - 2 * var(--pad)) * var(--fit,1) * var(--w) / var(--h)));height:auto;aspect-ratio:var(--w) / var(--h);border-radius:10px;object-fit:cover;pointer-events:none;opacity:0;transform-origin:0 50%;transition:opacity .4s var(--out),transform .4s var(--out)}
+.cshot.reel img{width:min(calc((100cqw - 2 * var(--pad)) * var(--fit,1)),var(--cap),calc((100cqh - 2 * var(--pad)) * var(--fit,1) * var(--w) / var(--h)));max-width:none;max-height:none}   /* a reel's still takes the video's own size, so the one fades in exactly over the other (on a phone its picture's natural width, 92vw, held it smaller than a reel drawn larger: --fit) */
 .cshot video.is-on{opacity:1}
 @media (max-width:899px){ .cshot video{transform-origin:50% 50%} }
 /* and the reel fills its panel, edge to edge on black (2026-11-16, Werner: "when you zoom in to the player it becomes full
@@ -242,7 +243,7 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 /* a reel on its own backdrop (2026-11-16, Werner: the GALVANY reel, "remove the background so it only sits on the card"):
    the panel takes the backdrop's colour (--sit, build.mjs), so the backdrop's edges vanish and the app's window sits on
    the card; no shadow of its own, as the window has one. Where the reel zooms in, the screen keeps its rounded corners */
-.cshot.sit{background:var(--sit)}
+.cshot.sit{background:var(--sit)}   /* --fit (build.mjs): a reel whose backdrop is wide around its window (Juno's: the window at most 85% of the frame) is drawn larger than the padding allows, and the panel crops the backdrop; 1 elsewhere */
 .cshot.sit img,.cshot.sit video{box-shadow:none}
 .cshot.fill img,.cshot.fill video{inset:0;margin:0;translate:none;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto;object-fit:cover;border-radius:0;box-shadow:none;transform-origin:50% 50%}
 /* only the picture takes the pointer, above the card's link layer (h3 a::after) */
