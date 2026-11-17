@@ -293,7 +293,7 @@
     });
   });
   /* the Bandcamp card's reel (2026-11-16, Werner: "add this product reel on the bandcamp player project card instead of
-     the image"). Nothing is fetched until the card is near the screen; then it plays from its still's moment (data-t0),
+     the image"). Nothing is fetched until the card is on the screen; then it plays from its still's moment (data-t0),
      loops between data-from and data-to (past the video's own fade in and out) and pauses once the card has gone. With
      reduced motion or data saving it is never loaded: the still stays */
   $('.cshot video[data-src]').forEach(function (v) {
@@ -307,12 +307,14 @@
     v.addEventListener('ended', function () { v.currentTime = from; v.play().catch(function () {}); });
     v.addEventListener('loadedmetadata', function () { v.currentTime = parseFloat(v.getAttribute('data-t0')) || 0; }, { once: true });   /* a seek before the file is known is lost (Chrome) */
     v.addEventListener('timeupdate', function () { if (!v.seeking && v.currentTime > from && !v.paused) v.classList.add('is-on'); });   /* shown once it plays past its fade, over its still */
+    /* only once a quarter of the picture is on the screen (2026-11-17: with 300px to spare, a phone fetched the GALVANY
+       reel, 24.6 MB, as the homepage opened, its card starting 200px below the screen); paused again below that */
     new IntersectionObserver(function (es) {
-      if (es[es.length - 1].isIntersecting) {
+      if (es[es.length - 1].intersectionRatio >= 0.25) {
         if (!started) { started = true; v.src = v.getAttribute('data-src'); }
         var p = v.play(); if (p && p.catch) p.catch(function () { /* not allowed to play: the still stays */ });
       } else if (started) v.pause();
-    }, { rootMargin: '300px 0px' }).observe(v.closest('.cshot'));
+    }, { threshold: [0, 0.25] }).observe(v.closest('.cshot'));
   });
   /* a card's cover comes in when the card does (css: .f-cover.in) */
   var covers = $('.f-cover');
