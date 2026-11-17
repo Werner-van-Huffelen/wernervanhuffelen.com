@@ -46,9 +46,16 @@
    The full stop still meets a line of the grid, a horizontal one: js/heroes.js lifts the headline alone by less than a
    square, which leaves the sentence and its two squares where they are. It no longer meets a vertical line as well:
    that took nudging the size, which made it jump as the window widened instead of growing evenly */
-.cx-1 h1{font-size:clamp(40px,calc(5vw + 24px),120px)}
-.cx-1 .lead-in .lede{font-size:clamp(min(20px,calc(100cqw / 16.9)),calc((5vw + 24px) * .262),32px);max-width:16.9em;text-wrap:balance}   /* 2026-11-16 (Werner: at most 32px; then "make sure the subheader on the hero sits on 3 lines and is max 120% width of the hero title"). The title is 3.69 of its own size wide and the sentence 46.7 of its own size long, so the sentence is .27 of the title's size (the title's own 5vw + 24px) in a column of 16.4em: 1.2 titles wide, three balanced lines. Below about 1000px wide that would be under 20px, so it holds at 20px in the same 16.4em (330px), still three lines; and at most 32px from 1920. In Saans (2026-11-16, the new text font) the sentence is 48.1 of its size long: a column of 16.9em at .262 of the title's size keeps it three lines and 1.2 titles wide; on a phone narrower than its 16.9em at 20px (338px of text) it is a little smaller, so it still fits the width in three */
-.cx-1 .lead-in{align-self:end;padding-bottom:calc(var(--c) * 2);row-gap:calc(clamp(40px,calc(5vw + 24px),120px) * .27)}   /* the gap under the headline (2026-11-16, Werner: "reduce the gap between the title and subheader on the hero"): fixed, .27 of its size between the boxes, which leaves about a fifth of its size between the descenders of "shipped" and the sentence's capitals. The headline is no longer moved to put its full stop on a line (js/heroes.js) */
+.cx-1{--hs:clamp(40px,calc(5vw + 24px),120px)}   /* the headline's size; the sentence and the gap under it are sized from it */
+/* upright (2026-11-17, Werner, on a phone: the headline read smaller than the cards' titles, "scale it up"): on a phone
+   5vw + 24px hardly grows (43px at 390, only 1.4 times a card's title, which fills four lines of its card). Held upright,
+   phones and tablets alike, it climbs faster, 13vw + 20px (69px at 390, 2.2 times a card's title; 120px from about 770),
+   and never wider than the column takes "prototyped", the roll's longest word (5.05em, so 5.2em of room), nor more than
+   15.5% of the hero's height, which holds an upright tablet's hero, at 88% of its width, to about 105px at 768 */
+@media (orientation:portrait){ .cx-1{--hs:clamp(40px,min(calc(13vw + 20px),calc((100vw - 2 * var(--m)) / 5.2),calc(var(--hh) * .155)),120px)} }
+.cx-1 h1{font-size:round(down,var(--hs),4px)}   /* on the 4px grid (2026-11-17, the type scale) */
+.cx-1 .lead-in .lede{font-size:round(nearest,clamp(min(20px,calc(100cqw / 16.9)),calc(var(--hs) * .262),32px),4px);max-width:60ch;line-height:1.5;text-wrap:balance}   /* 2026-11-17 (Werner: "On .lede, increase max-width so line length reaches 45–75ch, and raise line-height from 1.20 to around 1.5", Juno's audit): 60ch, so the sentence falls in two balanced lines of about 57 characters, at 1.5. It was 16.9em, three lines of about 34, at 1.2. Before that, 2026-11-16 (Werner: at most 32px; then "make sure the subheader on the hero sits on 3 lines and is max 120% width of the hero title"). The title is 3.69 of its own size wide and the sentence 46.7 of its own size long, so the sentence is .27 of the title's size (the title's own 5vw + 24px) in a column of 16.4em: 1.2 titles wide, three balanced lines. Below about 1000px wide that would be under 20px, so it holds at 20px in the same 16.4em (330px), still three lines; and at most 32px from 1920. In Saans (2026-11-16, the new text font) the sentence is 48.1 of its size long: a column of 16.9em at .262 of the title's size keeps it three lines and 1.2 titles wide; on a phone narrower than its 16.9em at 20px (338px of text) it is a little smaller, so it still fits the width in three */
+.cx-1 .lead-in{align-self:end;padding-bottom:calc(var(--c) * 2);row-gap:calc(var(--hs) * .27)}   /* the gap under the headline (2026-11-16, Werner: "reduce the gap between the title and subheader on the hero"): fixed, .27 of its size between the boxes, which leaves about a fifth of its size between the descenders of "shipped" and the sentence's capitals. The headline is no longer moved to put its full stop on a line (js/heroes.js) */
 .cx .under{grid-template-columns:minmax(0,1fr);padding-top:18px}
 /* 2026-11-15 (Werner): the note under the timeline ("Getting sh*t done since 2015") moved to the Experience header.
    Its room stays (18px and two 11px lines): the timeline keeps its place 146px over the hero's foot, which the grid's
@@ -89,7 +96,7 @@
 .cx-1 .grid .pin.wink{opacity:0;transform:none;transition:opacity 3.2s ease-in-out}
 .cx-1 .grid .pin.wink.up{opacity:.6}
 @media (prefers-reduced-motion:no-preference){ .js .cx-1 .grid>.pin:not(.wink){display:none} }
-.cx-1 .lit{position:absolute;width:var(--c);height:var(--c);background:rgba(var(--acc),.2);box-shadow:0 0 30px 8px rgba(var(--acc),.42),inset 0 0 0 1px rgba(var(--acc),.6);animation:lit 1.3s ease-out forwards}
+.cx-1 .lit{position:absolute;width:var(--c);height:var(--c);background:rgba(var(--acc),.2);box-shadow:0 0 30px 8px rgba(var(--acc),.42),inset 0 0 0 1px rgba(var(--acc),.6);animation:lit .4s ease-out forwards}
 @keyframes lit{from{opacity:1}to{opacity:0}}
 .cx.on .pin{transform:none}
 /* the portrait (2026-11-14, Werner): on the right, standing on the timeline and centred on the Tested tick. It is an
@@ -120,11 +127,11 @@
   background-image:linear-gradient(rgba(var(--acc),.1),rgba(var(--acc),.1)),var(--img);
   background-size:auto,calc(var(--c) * var(--n)) calc(var(--c) * var(--n));
   background-position:0 0,calc(var(--c) * var(--x) * -1) calc(var(--c) * var(--y) * -1);
-  box-shadow:inset 0 0 0 .5px rgba(var(--acc),.34);transition:opacity 1.4s ease-out}
+  box-shadow:inset 0 0 0 .5px rgba(var(--acc),.34);transition:opacity .4s ease-out}
 .cx-1 .who .px.on{opacity:var(--o,1);transition-duration:.16s}
 .cx-1 .who .halo{position:absolute;left:0;top:0;width:calc(var(--c) * 12);height:calc(var(--c) * 12);margin:calc(var(--c) * -6);border-radius:50%;
-  background:radial-gradient(closest-side,rgba(var(--acc),.36),rgba(var(--acc),.12) 60%,rgba(var(--acc),0));opacity:0;transform:translate(var(--hx,0),var(--hy,0));transition:opacity .6s ease-out}
-.cx-1 .who.near .halo{opacity:1;transition-duration:.25s}
+  background:radial-gradient(closest-side,rgba(var(--acc),.36),rgba(var(--acc),.12) 60%,rgba(var(--acc),0));opacity:0;transform:translate(var(--hx,0),var(--hy,0));transition:opacity .3s ease-out}
+.cx-1 .who.near .halo{opacity:1;transition-duration:.2s}
 @media (prefers-reduced-motion:reduce){ .js .cx-1 .who img{opacity:1} }
 /* the wave that runs over the grid when the dot lands (js/heroes.js): one canvas over the hero, behind the type */
 .cx-1 .wave{position:absolute;left:0;z-index:-1;pointer-events:none}
@@ -170,8 +177,8 @@
   .cx.on .roll>span{animation:croll 5.2s .5s both}
   .cx.on .ruler .dot,.cx.on .glow{animation:crun 5.2s .5s both}
   .cx.on .fill{animation:cfill 5.2s .5s both}
-  .cx.on .tick span{animation:clit .5s var(--flow) var(--t) both}
-  .cx.on .tick{animation:ctick .5s var(--flow) var(--t) both}
+  .cx.on .tick span{animation:clit .3s var(--flow) var(--t) both}
+  .cx.on .tick{animation:ctick .3s var(--flow) var(--t) both}
   .cx-5.on .col{animation:ccol 1.1s var(--flow) var(--t) both}
   .cx-4.on .ping{animation:cping 1.5s var(--flow) 5.05s both}
   @keyframes crun{

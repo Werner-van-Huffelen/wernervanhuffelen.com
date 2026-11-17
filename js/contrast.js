@@ -48,7 +48,7 @@
       s = (W - 2 * m) / (W <= 760 ? 16 : 32);
       return { c: s, x0: m, y0: -(scrollY % s) };
     };
-    var DUR = 1150, DEEP = 6, wave = 0;                                     /* the switch's length (ms), and the lit band's depth in squares */
+    var DUR = 400, DEEP = 6, wave = 0;   /* 400ms (2026-11-17, was 1150: an interaction stays under half a second) */                                     /* the switch's length (ms), and the lit band's depth in squares */
     var ease = function (t) { return 1 - (1 - t) * (1 - t); };
     btn.addEventListener('click', function () {
       var to = dark() ? 'light' : 'dark', me = ++wave, cv = null;
@@ -427,16 +427,17 @@
       else if (e.key === 'ArrowLeft') { e.preventDefault(); show(cur - 1, 'key'); }
       else if (e.key === 'Escape') { e.preventDefault(); close(); }          /* the dialog's own Esc, made sure of */
     });
-    /* each picture's frame becomes the button; a stepping screen opens on the state it shows */
+    /* each picture gets a real button laid over it (2026-11-17, Juno's brief: "convert any div/span click handlers to
+       native <button> elements"; the frame itself was the button, a div with role, tabindex and its own keys). A
+       stepping screen opens on the state it shows */
     var mats = [];
     items.forEach(function (t) { if (mats.indexOf(t.mat) < 0) mats.push(t.mat); });
     mats.forEach(function (m) {
-      var mine = items.filter(function (t) { return t.mat === m; });
-      m.classList.add('zoom'); m.tabIndex = 0; m.setAttribute('role', 'button');
-      m.setAttribute('aria-label', 'Enlarge: ' + (mine[0].cap || mine[0].alt || 'picture'));
-      var go = function () { var on = mine.filter(function (t) { return !t.frame || t.frame.classList.contains('is-on'); })[0] || mine[0]; open(items.indexOf(on)); };
-      m.addEventListener('click', go);
-      m.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+      var mine = items.filter(function (t) { return t.mat === m; }), b = d.createElement('button');
+      b.type = 'button'; b.className = 'enlarge';
+      b.setAttribute('aria-label', 'Enlarge: ' + (mine[0].cap || mine[0].alt || 'picture'));
+      b.addEventListener('click', function () { var on = mine.filter(function (t) { return !t.frame || t.frame.classList.contains('is-on'); })[0] || mine[0]; open(items.indexOf(on)); });
+      m.classList.add('zoom'); m.appendChild(b);
     });
   })();
 
