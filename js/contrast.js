@@ -118,14 +118,42 @@
   /* 3. led by the scroll: the nav shrinks, covered cards step back (the statement that filled in word by word comes in whole since 2026-11-16),
         the service nearest the middle of the screen lights up, the footer name rises */
   var nav = d.querySelector('.nav'), fills = $('[data-fill]'), cards = $('.card'), rows = $('.svc>li'), mark = d.querySelector('.mark');
-  var queued = false;
+  var queued = false, first = true;
+  /* a case page's back button and the round one beside the nav (2026-11-16, Werner: "move the back button next to the
+     (sticky) menu bar", then "make sure the menu bar decreases the size as soon as it is aligned with the back button to
+     make it a smooth transition"). Where the round one is shown (not on a phone), the pill no longer shrinks at a set
+     120px: it shrinks the moment the page's back button comes up to it, and in that same moment the button lifts into
+     the round one: the round one starts where the button is, at its size, and glides to its place beside the pill as
+     the pill shrinks (the same .35s and curve, so it rides the pill's edge). Scrolling back, they cross-fade */
+  var own = d.querySelector('.ctop .back'), dock = d.querySelector('.nav-back'), docked = false;
+  if (dock) dock.addEventListener('transitionend', function (e) { if (e.propertyName === 'transform') dock.classList.remove('flip'); });
+  function dockBack(on, still) {
+    docked = on;
+    if (on && !still && !reduce) {
+      var g = own.querySelector('.go') || own, o = g.getBoundingClientRect();
+      if (o.bottom > 0 && o.top < innerHeight) {
+        dock.style.transition = 'none'; dock.style.transform = 'none';
+        var b = dock.getBoundingClientRect();
+        dock.style.transform = 'translate(' + (o.left + o.width / 2 - b.left - b.width / 2).toFixed(1) + 'px,' + (o.top + o.height / 2 - b.top - b.height / 2).toFixed(1) + 'px) scale(' + (o.width / b.width).toFixed(3) + ')';
+        void dock.offsetWidth;
+        dock.style.transition = ''; dock.classList.add('flip'); dock.style.transform = '';
+      }
+    } else dock.classList.remove('flip');
+    own.classList.toggle('is-docked', on);
+    nav.classList.toggle('has-back', on);
+  }
   function frame() {
     queued = false;
     var vh = innerHeight;
     if (nav) {
       var small = scrollY > 120;
+      if (own && dock && getComputedStyle(dock).display !== 'none') {
+        small = own.getBoundingClientRect().top <= nav.getBoundingClientRect().bottom + 8;
+        if (small !== docked) dockBack(small, first);
+      } else if (docked) dockBack(false, true);
       if (!small && nav.classList.contains('is-small')) nav.classList.add('grown');   /* css: the surname fades back in */
       nav.classList.toggle('is-small', small);
+      first = false;
     }
     fills.forEach(function (el) {
       var r = el.getBoundingClientRect(), ws = el._w || (el._w = $('.w', el));
@@ -250,55 +278,41 @@
     var done = function () { img.classList.remove('is-loading'); };
     img.classList.add('is-loading'); img.addEventListener('load', done); img.addEventListener('error', done);
   });
-  /* a case page's title fills the width (2026-11-15, Werner, a screenshot of GALVANY's: "the header text should fill
-     the width of the screen"). It was held to 14.5em and balanced, so its lines filled about 70% of the width. Now it
-     keeps as many lines as it takes at the size the css gives it, and grows until they fill the width: the size the
-     whole line of text would need, spread over that many lines, then a step smaller while it still needs one more.
-     The titles differ in length, so each lands at its own size (about 100 to 115px on a 1440px screen); on a phone
-     they stay about as they were. Without scripts it is the css size, across the whole width */
-  /* the cards' titles too (2026-11-16, Werner: "same for the headers on the project cards, they could be slightly bigger
-     and fill up the entire width of the card"): the same fit, with the line count taken at a share of the card's text
-     width (below), and a title that only grows, or shrinks by at most 4% to keep to its lines */
-  /* (2026-11-16, Werner: "titles should be unified across all screens and case studies and use the 8px grid system"):
-     a case page's title is no longer fitted here. The css gives every case the same size at a given width, on the 8px
-     grid (css/contrast.css, .chero .lead). Only the cards' titles are still fitted, each to its card */
-  function fitTitle(h, start) {
-    var ws = $('.w', h), queued = false;
-    if (!ws.length) return;
-    var lines = function () { var t = {}; ws.forEach(function (w) { t[w.offsetTop] = (t[w.offsetTop] || 0) + 1; }); return t; };
-    var rows = function () { return Object.keys(lines()).length; };
-    function fit() {
-      queued = false;
-      h.style.fontSize = ''; h.style.textWrap = '';
-      var cw = h.clientWidth;
-      if (!(cw > 0)) return;
-      /* measured at a size that is a share of the width (on a phone a larger one), so a title's length in widths, and
-         with it its line count and its breaks, is the same at every width; it does not flip as the window changes */
-      var f0 = start ? start() : cw * (innerWidth < 600 ? 0.112 : 0.07);
-      h.style.fontSize = f0.toFixed(2) + 'px';
-      h.style.whiteSpace = 'nowrap'; var rg = d.createRange(); rg.selectNodeContents(h); var x = rg.getBoundingClientRect().width / cw; h.style.whiteSpace = '';   /* the title's length, in widths (the text's own, not its box's: a short title is narrower than its box) */
-      var lo = Math.floor(x), n = start ? (lo >= 1 && x / lo <= 1.04 ? lo : Math.max(1, Math.ceil(x)))   /* a card's: grows to fill its lines, or shrinks by at most 4% to keep to them */
-        : (lo >= 1 && x / lo <= 1.12 ? lo : lo + 1);                                             /* a case page's: just over a whole number of lines, that many, a little smaller; otherwise one more, larger */
-      var f = f0 * n / x * 0.985;
-      h.style.fontSize = f.toFixed(2) + 'px';
-      for (var k = 0; k < 24 && rows() > n; k++) { f *= 0.985; h.style.fontSize = f.toFixed(2) + 'px'; }
-      var t = lines(), last = Math.max.apply(null, Object.keys(t).map(Number));
-      if (n > 1 && t[last] === 1) h.style.textWrap = 'pretty';                               /* not one word alone on the last line */
-    }
-    var later = function () { if (!queued) { queued = true; requestAnimationFrame(fit); } };
-    fit(); addEventListener('resize', later);
-    if (d.fonts && d.fonts.ready) d.fonts.ready.then(fit);
-  }
-  $('.card h3.big').forEach(function (h) { fitTitle(h, function () { return h.clientWidth * (innerWidth < 600 ? 0.086 : innerWidth < 900 ? 0.04 : 0.085); }); });   /* measured at a share of the card's text width, one per layout (a phone; a tablet, the card stacked and wide; text beside the picture), so a title keeps its line count at every width within one */
+  /* (the titles were fitted here, each to its own width: first the case pages', then the cards'. Since 2026-11-16 the
+     css sizes both: a case's title on the 8px grid, and the cards' titles one size for all five, a share of the card's
+     text width, so they match at every width and wrap across the whole of it. Werner: "make sure the titles on the
+     project cards are the same size on all breakpoints, make sure they fill the fullwidth of the card") */
 
   /* a case page's back button (2026-11-15): opened from the homepage, it goes back in the history, so the homepage is
      where it was left; otherwise (a link from outside, or from another case) it follows its link to the case's card */
-  $('.back').forEach(function (a) {
+  $('.back, .nav-back').forEach(function (a) {
     a.addEventListener('click', function (e) {
       var r = null;
       try { r = d.referrer ? new URL(d.referrer) : null; } catch (x) { r = null; }
       if (r && r.origin === location.origin && /(\/|index\.html)$/.test(r.pathname) && history.length > 1) { e.preventDefault(); history.back(); }
     });
+  });
+  /* the Bandcamp card's reel (2026-11-16, Werner: "add this product reel on the bandcamp player project card instead of
+     the image"). Nothing is fetched until the card is near the screen; then it plays from its still's moment (data-t0),
+     loops between data-from and data-to (past the video's own fade in and out) and pauses once the card has gone. With
+     reduced motion or data saving it is never loaded: the still stays */
+  $('.cshot video[data-src]').forEach(function (v) {
+    var save = false;
+    try { save = !!(navigator.connection && navigator.connection.saveData); } catch (e) { /* unknown: play */ }
+    if (reduce || save || !('IntersectionObserver' in window)) return;
+    var from = parseFloat(v.getAttribute('data-from')) || 0, to = parseFloat(v.getAttribute('data-to')) || 0, started = false;
+    var loop = function () { if (to && v.currentTime >= to) v.currentTime = from; };
+    v.addEventListener('timeupdate', loop);
+    if (v.requestVideoFrameCallback) { var each = function () { loop(); v.requestVideoFrameCallback(each); }; v.requestVideoFrameCallback(each); }
+    v.addEventListener('ended', function () { v.currentTime = from; v.play().catch(function () {}); });
+    v.addEventListener('loadedmetadata', function () { v.currentTime = parseFloat(v.getAttribute('data-t0')) || 0; }, { once: true });   /* a seek before the file is known is lost (Chrome) */
+    v.addEventListener('timeupdate', function () { if (!v.seeking && v.currentTime > from && !v.paused) v.classList.add('is-on'); });   /* shown once it plays past its fade, over its still */
+    new IntersectionObserver(function (es) {
+      if (es[es.length - 1].isIntersecting) {
+        if (!started) { started = true; v.src = v.getAttribute('data-src'); }
+        var p = v.play(); if (p && p.catch) p.catch(function () { /* not allowed to play: the still stays */ });
+      } else if (started) v.pause();
+    }, { rootMargin: '300px 0px' }).observe(v.closest('.cshot'));
   });
   /* a card's cover comes in when the card does (css: .f-cover.in) */
   var covers = $('.f-cover');

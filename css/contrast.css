@@ -9,6 +9,11 @@
    ========================================================================== */
 
 @font-face{font-family:"Fragment Mono";font-style:normal;font-weight:400;font-display:swap;src:url(../assets/fonts/fragment-mono-latin.woff2) format("woff2")}
+/* Funnel Display from the site itself, no longer from Google (2026-11-16, Juno's audit: the Google Fonts stylesheet held
+   up the first paint by about .8s on a phone). Google's own variable files, 300 to 800, as the Full Stop site has them;
+   the Latin one is preloaded by each page (build.mjs) */
+@font-face{font-family:"Funnel Display";font-style:normal;font-weight:300 800;font-display:swap;src:url(../assets/fonts/funnel-display-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Funnel Display";font-style:normal;font-weight:300 800;font-display:swap;src:url(../assets/fonts/funnel-display-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 
 :root{
   --paper:#f1f0f3; --card:#fff; --ink:#121016; --grey:#6d6877; --faint:#bcb8c6; --line:#d8d5de;
@@ -50,8 +55,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 :focus-visible{outline:2px solid var(--stop);outline-offset:3px}
 ::selection{background:var(--stop);color:var(--on-stop)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.skip{position:absolute;left:var(--m);top:-100px;z-index:50;padding:8px 12px;background:var(--ink);color:var(--on-ink);border-radius:8px}
-.skip:focus{top:8px}
+.skip{position:fixed;left:var(--m);top:-100px;z-index:50;display:flex;align-items:center;min-height:44px;padding:0 16px;background:var(--ink);color:var(--on-ink);border-radius:8px}
+.skip:focus{top:8px}   /* fixed (2026-11-16, Juno's audit: "not reachable with Tab"): it shows at the top of the screen however far the page is scrolled, 44px tall like a finger's tap */
 .mono{font:400 .6875rem/1.45 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--grey)}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--g)}
 
@@ -103,7 +108,13 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
    past the screen's edge, 42px at 320 (2026-11-15). Below 375px About goes from the nav (it is one scroll down) and the
    gaps close a little */
 @media (max-width:374px){ .nav .links a[href$="#about"]{display:none} .nav{gap:8px} .nav .mode{margin-left:0} }
-@media (min-width:375px) and (max-width:389px){ .nav{gap:10px} .nav .links a{padding-inline:6px} }   /* 375 to 389px (2026-11-16, Werner: "fix the nav overflow at 375px"): Work and About still fit, a little closer together; the nav ran 10px wider than its pill in Saans (4px in Inter Tight) */
+@media (min-width:375px) and (max-width:389px){ .nav{gap:10px} .nav .links a{padding-inline:6px} }
+/* a finger's tap (2026-11-16, Juno's audit: the light and dark button and the CV pill were 40px): on a phone, and on
+   any touch screen, the nav's buttons and links are 44px tall in a nav of 56px. On a phone the button sits the 4px it
+   grew closer to the links, so the nav still fits at 320 and 375 */
+@media (max-width:760px), (pointer:coarse){ .nav{height:56px} .nav .pill,.nav .mode{height:44px} .nav .mode{width:44px} .nav .nav-back{width:56px;height:56px} .nav .links a{display:inline-flex;align-items:center;min-height:44px} }
+@media (max-width:760px){ .nav .mode{margin-left:-8px} }
+@media (max-width:374px){ .nav .mode{margin-left:-4px} }   /* 375 to 389px (2026-11-16, Werner: "fix the nav overflow at 375px"): Work and About still fit, a little closer together; the nav ran 10px wider than its pill in Saans (4px in Inter Tight) */
 /* the switch itself (js/contrast.js): the hero's wave. The new colours arrive square by square on the hero's grid,
    from the button outwards, and a band of lit squares runs with the front and fades behind it (.tw, a canvas over the
    page that the transition shows live). Nothing else moves on its own during it (the covers' names belong to the
@@ -166,7 +177,19 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 .card h3{font-size:var(--h3);font-weight:640;letter-spacing:-.04em;line-height:1}
 /* 2026-11-15 (Werner): a card's name and line are now its case page's headline (bold part, light part, the violet
    full stop), at the size the name had */
-.card h3.big{font-weight:300;letter-spacing:-.04em;line-height:1.04;max-width:none;text-wrap:wrap;font-size:clamp(1.75rem,2.8vw,4rem)}   /* keeps growing past 1440px wide, to 64px (2026-11-16, Werner: "the title on the project cards should be larger on the larger breakpoints"); it stopped at 40px. Then the whole width of the card's text (js/contrast.js fits the size so its lines fill it; it was held to 16em) */
+.card .txt{container-type:inline-size}
+.card h3.big{font-weight:300;letter-spacing:-.04em;line-height:1.04;max-width:none;text-wrap:wrap;font-size:7.8cqi}
+@media (max-width:599px){ .card h3.big{font-size:10cqi} }
+@media (min-width:600px) and (max-width:899px){ .card h3.big{font-size:5.9cqi} }
+/* (2026-11-16, Werner: "make sure the titles on the project cards are the same size on all breakpoints, make sure they
+   fill the fullwidth of the card") one size for all five cards, a share of the card's text width (cqi: .txt is the
+   container), so they match each other at every width and wrap across the whole of it: 7.8% beside the picture (36px
+   at 1440, 52 at 1920, 72 at 2560), 10% on a phone, 5.9% on a tablet, where the card is stacked and its text wide. With
+   the size a share of the width, the line breaks are the same at every width of a layout; these shares are where all
+   five titles' longest lines reach 84 to 97% of the width (simulated over 5 to 13%), with room for a browser's own
+   rounding before a word drops to the next line.
+   Until then each title was fitted to its own lines by js/contrast.js, so the five came out at five sizes */
+/* before: clamp(1.75rem,2.8vw,4rem), which kept growing past 1440px wide, to 64px (2026-11-16, Werner: "the title on the project cards should be larger on the larger breakpoints"); it stopped at 40px. Then the whole width of the card's text (js/contrast.js fits the size so its lines fill it; it was held to 16em) */
 .card h3 a::after{content:"";position:absolute;inset:0;z-index:1}
 .card .line{font-size:clamp(1.0625rem,1.35vw,1.25rem);line-height:1.3;letter-spacing:-.015em;color:var(--grey);max-width:24em;text-wrap:pretty}
 .card .hd{margin-top:auto}                                               /* 2026-11-14 (Werner): name and line sit right above the list, not under the counter */
@@ -197,12 +220,31 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
 @media (min-width:2200px){ .cshot:not(.bare){--zs:1.12} }
 .cshot img{position:absolute;inset:0;margin:auto;width:auto;height:auto;max-width:min(calc(100% - 2 * var(--pad)),var(--cap));max-height:min(calc(100% - 2 * var(--pad)),var(--caph));border-radius:10px;box-shadow:0 0 0 1px rgba(var(--sh),.08),0 30px 60px -30px rgba(var(--sh),.4);transform-origin:0 50%}
 .cshot.bare img{border-radius:0;box-shadow:none;transform-origin:50% 50%}   /* Bandcamp's two panels grow from their middle; a screen grows from its left edge, staying centred (Werner, 2026-11-16) */
+@media (max-width:899px){ .cshot img{transform-origin:50% 50%} }   /* where the picture sits above the text, every picture grows from its middle (2026-11-16, Werner: "on breakpoints where the image on the project cards sits above the text, ... grow from the center instead of top left") */
+/* the Bandcamp card's reel (2026-11-16, Werner: "add this product reel on the bandcamp player project card instead of
+   the image"): the video lies on its still, in the same box (the still's sizing, in the .cshot's own units), and shows
+   once it plays; it comes in and zooms with the still, from the same point (js/contrast.js loads and plays it) */
+.cshot.reel{container-type:size}
+.cshot video{position:absolute;inset:0;margin:auto;z-index:3;width:min(calc(100cqw - 2 * var(--pad)),var(--cap),calc((100cqh - 2 * var(--pad)) * var(--w) / var(--h)));height:auto;aspect-ratio:var(--w) / var(--h);border-radius:10px;object-fit:cover;pointer-events:none;opacity:0;transform-origin:0 50%;transition:opacity .4s var(--out),transform .9s var(--out)}
+.cshot video.is-on{opacity:1}
+@media (max-width:899px){ .cshot video{transform-origin:50% 50%} }
+/* and the reel fills its panel, edge to edge on black (2026-11-16, Werner: "when you zoom in to the player it becomes full
+   screen"): where the reel zooms in, the player is the card's whole picture. It covers the panel from its middle, so its
+   wide shots of the Bandcamp page (the loop's first and last seconds) lose their sides; on hover it grows a little, as
+   it already fills the panel */
+.cshot.fill{background:#000;--zs:1.06}
+/* a reel on its own backdrop (2026-11-16, Werner: the GALVANY reel, "remove the background so it only sits on the card"):
+   the panel takes the backdrop's colour (--sit, build.mjs), so the backdrop's edges vanish and the app's window sits on
+   the card; no shadow of its own, as the window has one. Where the reel zooms in, the screen keeps its rounded corners */
+.cshot.sit{background:var(--sit)}
+.cshot.sit img,.cshot.sit video{box-shadow:none}
+.cshot.fill img,.cshot.fill video{inset:0;margin:0;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto;object-fit:cover;border-radius:0;box-shadow:none;transform-origin:50% 50%}
 /* only the picture takes the pointer, above the card's link layer (h3 a::after) */
 .cshot{pointer-events:none} .cshot img{z-index:2;pointer-events:auto}
 @media (prefers-reduced-motion:no-preference){
   .js .cshot img{transition:opacity .9s var(--out),transform .9s var(--out)}
-  .js .cshot:not(.in) img{opacity:0;transform:translateY(24px)}
-  @media (hover:hover) and (pointer:fine){ .cshot.in img:hover{transform:scale(var(--zs))} }
+  .js .cshot:not(.in) img{opacity:0;transform:translateY(24px)} .js .cshot:not(.in) video{transform:translateY(24px)}
+  @media (hover:hover) and (pointer:fine){ .cshot.in img:hover,.cshot.in img:hover + video{transform:scale(var(--zs))} }
 }
 /* 2026-11-14: a card's picture sits on its flat ground. It had the page's grid behind it for a while (Werner, then: "add
    the grid behind the images on the case study cards"), and he took it out again. The tints (.lav, .mat, .night) stay */
@@ -279,10 +321,12 @@ html.lb-open{overflow:hidden}
     .card:hover .mat:not([data-screens]) .frame.f-cover.is-on.in img{transform:scale(1.1);transition:transform .8s cubic-bezier(.2,.75,.2,1),opacity .3s}
   }
 }
-.cap{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:0 16px;min-height:26px;padding-top:10px}
+.cap{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:0 16px;min-height:26px;padding-top:10px;color:#655f70}   /* a little darker than --grey (2026-11-16): the captions sit on the tinted panels, where --grey was 4.33:1 (4.08 on lavender); this is 4.65 or more */
+:root[data-theme="dark"] .cap{color:var(--grey)}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .cap{color:var(--grey)} }
 .panel.night .cap,.night .cap{color:rgba(255,255,255,.6)}
-.cap button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;opacity:.6;padding-block:13px;margin-block:-13px;transition:opacity .2s}
-.cap button:hover,.cap button[aria-pressed="true"]{opacity:1}
+.cap button{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;padding-block:13px;margin-block:-13px;transition:color .2s}
+.cap button:hover{color:var(--ink)} .night .cap button:hover{color:#fff}   /* the screens not shown: the caption's own grey, no longer at .6 (2026-11-16: 2.94:1 in dark); the one shown is ink and underlined */
 .cap button[aria-pressed="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
 .night .cap button[aria-pressed="true"]{color:#fff}
 .shot{background:var(--mat);padding:clamp(12px,1.6vw,24px);border-radius:var(--rs)}
@@ -414,7 +458,7 @@ html.lb-open{overflow:hidden}
    and open. */
 .svc>li{border-top:1px solid var(--line);transition:color .4s var(--out)}
 .svc>li:last-child{border-bottom:1px solid var(--line)}
-.js .svc>li{color:var(--faint)}
+.js .svc>li{color:var(--grey)}   /* the rows not lit: grey, 4.75:1 on the page (6.76:1 in dark), where --faint was 1.71:1 and three of the four rows were always that faint (2026-11-16, Juno's audit) */
 .js .svc>li.is-lit,.js .svc>li:hover,.js .svc>li.is-open,.js .svc>li:focus-within{color:var(--ink)}
 .svc .head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px var(--g);align-items:center;width:100%;padding-block:clamp(14px,1.7vw,24px);text-align:left}
 .svc .n,.svc .k,.svc .v{grid-column:1}
@@ -496,7 +540,7 @@ html:not(.js) .svc .tog{display:none}
 
 /* ── contact: the violet panel ──────────────────────────────────────────── */
 .cta{--ink:#121016;--on-ink:#fff;--night:#15111f;display:grid;gap:clamp(36px,5vw,72px);margin:var(--sec) var(--m) 0;padding:clamp(22px,3.2vw,48px);border-radius:var(--r);background:var(--stop);color:var(--night)}   /* its own ink: the panel looks the same on the light and the dark page */
-.cta .mono{color:rgba(21,17,31,.7)}
+.cta .mono{color:var(--night)}   /* the panel's own ink (2026-11-16, Juno's audit): at .7 the label was 3.21:1 on the violet, which is light enough that even the full ink is only 4.77:1 */
 .cta .big{font-size:var(--h2);line-height:1.04;max-width:14em}   /* 2026-11-14 (Werner): a little more air between its three lines; it was .94 */
 .cta .stop{background:var(--night)}
 .cta .row{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px}
@@ -511,7 +555,7 @@ html:not(.js) .svc .tog{display:none}
 
 /* ── footer: the name, cut off by the edge ──────────────────────────────── */
 .foot{padding:clamp(40px,5vw,72px) var(--m) 0;overflow:hidden}
-.foot .row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 22px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.foot .row{position:relative;z-index:1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 22px;padding-bottom:16px;border-bottom:1px solid var(--line)}   /* above the name, which rises into it (2026-11-16, Juno's audit: Impressum's focus ring was hidden behind it) */
 .foot .row span{display:flex;flex-wrap:wrap;gap:0 22px}
 .foot a:hover{color:var(--ink)}
 /* 2026-11-14 (Werner): the whole name, not "Werner" alone. With its full stop and the wider word spaces (the tight
@@ -532,10 +576,21 @@ html:not(.js) .svc .tog{display:none}
 }
 .ctop .crumb{margin:0}
 .back{display:inline-flex;align-items:center;gap:12px;color:var(--ink)}
+/* and beside the nav (2026-11-16, Werner: "when scrolling down on the page can you move the back button next to the
+   (sticky) menu bar"): a round button left of the pill, as tall as it, once the pill is small and the page's own back
+   button has come up to the pill (js: .has-back), lifting out of it. Not on a phone: the nav is as
+   wide as the screen there, and it has Work */
+.nav-back{position:absolute;right:calc(100% + 9px);top:-1px;display:grid;place-items:center;width:52px;height:52px;border:1px solid var(--line);border-radius:50%;background:var(--paper);color:var(--ink);box-shadow:0 8px 30px -18px rgba(var(--sh),.35);opacity:0;visibility:hidden;transition:transform .35s var(--out),background .25s var(--out),color .25s var(--out),border-color .25s var(--out)}   /* no fade: it goes the instant the page's own button is back below the pill (2026-11-16, Werner: "hide the fixed back button as soon as it passes the menu bar"); fading, it rode the pill's edge across the screen as the pill grew */
+.nav-back svg{width:16px;height:16px}
+.nav.is-small.has-back .nav-back{opacity:1;visibility:visible}
+.nav-back.flip{transition:transform .35s var(--out),background .25s var(--out),color .25s var(--out),border-color .25s var(--out)}   /* lifting out of the page's button (js): shown at once, only its place and size move, with the pill's .35s */
+.ctop .back{transition:opacity .25s var(--out)}
+.ctop .back.is-docked{opacity:0;visibility:hidden;transition:none}   /* gone the moment the round one takes over; back in a fade */
+.nav-back:hover{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
+@media (max-width:760px){ .nav-back{display:none} }
 .back .go{width:40px;height:40px}
-.back .go svg{transition:transform .3s var(--out)}
 .back:hover .go{background:var(--stop);border-color:var(--stop);color:var(--on-stop)}
-.back:hover .go svg{transform:translateX(-2px)}
+/* (the back buttons' arrows no longer step left on hover: 2026-11-17, Werner: "remove the motion on the arrow icon when you hover on the back button"; the circle still turns violet) */
 @media (max-width:520px){ .ctop .crumb{display:none} }                   /* a phone: the button alone; the nav has Work */
 /* the cover, under the headline: the card's panel, larger, on its own */
 .ccover{min-height:0;margin-top:clamp(40px,4.6vw,72px);border-radius:var(--r);overflow:hidden}
@@ -628,6 +683,11 @@ html:not(.js) .svc .tog{display:none}
      word: they fade in like any paragraph, and their full stop lands just after */
   .js [data-in]{opacity:0;transform:translateY(12px);transition:opacity .6s var(--out) calc(var(--d,0) * 1ms),transform .6s var(--out) calc(var(--d,0) * 1ms)}
   .js [data-in].in{opacity:1;transform:none}
+  /* the hero's sentence comes in with the page's first paint, not once the script has run (2026-11-16, Juno's audit:
+     on a phone it is the largest thing on the first screen, and waiting for the script put it at 3.9s). Same rise,
+     same delay (--d) */
+  .js .lead-in .lede[data-in]{transition:none;animation:lede-in .6s var(--out) calc(var(--d,0) * 1ms) both}
+  @keyframes lede-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
   .js [data-in="rise"] .stop{transform:scale(0);transition:transform .5s var(--back) calc(var(--d,0) * 1ms + 350ms)}
   .js [data-in="rise"].in .stop{transform:none}
   /* a wipe: the tile stays put (so it can be watched), its image rises into it */
