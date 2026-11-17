@@ -245,13 +245,23 @@ html.theming::view-transition-old(root),html.theming::view-transition-new(root){
    the card; no shadow of its own, as the window has one. Where the reel zooms in, the screen keeps its rounded corners */
 .cshot.sit{background:var(--sit)}   /* --fit (build.mjs): a reel whose backdrop is wide around its window (Juno's: the window at most 85% of the frame) is drawn larger than the padding allows, and the panel crops the backdrop; 1 elsewhere */
 .cshot.sit img,.cshot.sit video{box-shadow:none}
+.cshot video[data-bar]{clip-path:inset(calc(var(--ct,0) * 100%) 0 0 round 10px)}   /* the top cut off by --ct (js, data-bar: GALVANY's title bar where the reel fills the frame), and only the top: the box's top edge comes down, nothing is zoomed (2026-11-17, Werner: "can you only crop off the top part instead of zooming in, as it cuts off other parts as well") */
+.cshot.sit.reel:has(video[data-bar].is-on) img{visibility:hidden;transition:visibility 0s .45s}   /* its still goes once the video is in (after its .4s fade), so nothing of it shows above a cut top */
+/* and its edges fade into the panel (--feather, build.mjs; Juno's): a browser draws a video's colours its own way (Juno's
+   lavender came out #e1dcff in Chrome's canvas, #e5e0ff headless, #e6dfff on the screen), so a panel of one colour can
+   leave a faint rectangle where the video ends; a soft edge leaves none. The window stays clear of the fade (it fills
+   at most 85% of the frame across, 85% down) */
+.cshot.feather img,.cshot.feather video{-webkit-mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent),linear-gradient(to bottom,transparent,#000 7%,#000 93%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent),linear-gradient(to bottom,transparent,#000 7%,#000 93%,transparent);mask-composite:intersect}
 .cshot.fill img,.cshot.fill video{inset:0;margin:0;translate:none;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto;object-fit:cover;border-radius:0;box-shadow:none;transform-origin:50% 50%}
+.cshot.fill.contain video{object-fit:contain;background:#000;scale:var(--cover,1);translate:0 0;transition:opacity .4s var(--out),transform .4s var(--out),scale .8s cubic-bezier(.65,0,.35,1),translate .8s cubic-bezier(.65,0,.35,1)}
+.cshot.fill.contain video.is-wide{scale:var(--ws,1);translate:calc((1 - var(--ws,1)) * 50% + var(--wx,0%)) 0}   /* grown less, its right edge on the panel's: the left margin goes (2026-11-17, Werner: "the screen can be cut off on the left side (the margins) so we can zoom out a bit less"; --ws, js) */
+.cshot.fill.contain video.snap{transition:opacity .4s var(--out),transform .4s var(--out)}   /* (its black background fills the bands above and below the whole frame, where the still behind it showed through) Bandcamp's (2026-11-17, Werner: "only zoom out when the player is out of view, keep the zoomed in version of the player as is"): the whole reel, grown by --cover to fill the panel as before (its still is that close-up, cut the same way), and back to the whole frame on the panel's black, which is the reel's own, while the reel shows the whole page with the player at its edge (data-wide, js); the change takes 0.8s, in step with the reel's own camera moves */
 /* only the picture takes the pointer, above the card's link layer (h3 a::after) */
 .cshot{pointer-events:none} .cshot img{z-index:2;pointer-events:auto}
 @media (prefers-reduced-motion:no-preference){
   .js .cshot img{transition:opacity .4s var(--out),transform .4s var(--out)}
   .js .cshot:not(.in) img{opacity:0;transform:translateY(24px)} .js .cshot:not(.in) video{transform:translateY(24px)}
-  @media (hover:hover) and (pointer:fine){ .cshot.in img:hover,.cshot.in img:hover + video{transform:scale(var(--zs))} }
+  @media (hover:hover) and (pointer:fine){ .cshot.in:not(.reel) img:hover{transform:scale(var(--zs))} }   /* a reel does not zoom (2026-11-17, Werner: "can we remove the zoom on hover functionality on the reels"): it moves already */
 }
 /* 2026-11-14: a card's picture sits on its flat ground. It had the page's grid behind it for a while (Werner, then: "add
    the grid behind the images on the case study cards"), and he took it out again. The tints (.lav, .mat, .night) stay */

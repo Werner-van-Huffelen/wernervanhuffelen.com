@@ -310,14 +310,16 @@
     }
     function snap() {
       if (!h1 || !leadIn || !inner || !last) return;
-      h1.style.fontSize = ''; h1.style.translate = ''; leadIn.style.transform = '';
+      h1.style.fontSize = ''; h1.style.translate = ''; leadIn.style.transform = ''; leadIn.style.translate = '';
       var s = size(); if (!s.c) return;
       var y0 = s.r.top + 1200, p = restOf();
-      /* (2026-11-16, Werner: "reduce the gap between the title and subheader on the hero"): no longer moved. With the
-         sentence held two squares above the timeline, putting the full stop on a line meant moving the headline by up
-         to a square, so the gap under it changed with the width (31 to 85px). Now the gap is fixed (css/heroes-c.css),
-         and the full stop sits where the type puts it */
-      void y0; void p;
+      /* (2026-11-16, Werner: "reduce the gap between the title and subheader on the hero"): the headline alone was no
+         longer moved, as lifting it to a line changed the gap under it with the width (31 to 85px). Then (2026-11-17,
+         Werner: "can you make sure that the dot on the hero title sits on the grid again"): the headline and the sentence
+         move together, to the line nearest the full stop, up or down by half a square at most. The gap between them stays
+         as set (css/heroes-c.css); the sentence sits within half a square of its two squares above the timeline */
+      var ty = y0 + Math.round((p.y - y0) / s.c) * s.c + 0.5;
+      leadIn.style.translate = '0 ' + (ty - p.y).toFixed(2) + 'px';
     }
     snap();
     if (d.fonts && d.fonts.ready) d.fonts.ready.then(snap);

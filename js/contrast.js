@@ -48,7 +48,7 @@
       s = (W - 2 * m) / (W <= 760 ? 16 : 32);
       return { c: s, x0: m, y0: -(scrollY % s) };
     };
-    var DUR = 400, DEEP = 6, wave = 0;   /* 400ms (2026-11-17, was 1150: an interaction stays under half a second) */                                     /* the switch's length (ms), and the lit band's depth in squares */
+    var DUR = 600, DEEP = 6, wave = 0;   /* 600ms (2026-11-17, Werner: "the light to dark mode interaction and vice versa is too fast, can you reduce the speed to 600ms"; it was 400 after Juno's brief, 1150 before) */                                     /* the switch's length (ms), and the lit band's depth in squares */
     var ease = function (t) { return 1 - (1 - t) * (1 - t); };
     btn.addEventListener('click', function () {
       var to = dark() ? 'light' : 'dark', me = ++wave, cv = null;
@@ -301,7 +301,61 @@
     try { save = !!(navigator.connection && navigator.connection.saveData); } catch (e) { /* unknown: play */ }
     if (reduce || save || !('IntersectionObserver' in window)) return;
     var from = parseFloat(v.getAttribute('data-from')) || 0, to = parseFloat(v.getAttribute('data-to')) || 0, started = false;
-    var loop = function () { if (to && v.currentTime >= to) v.currentTime = from; };
+    var rate = parseFloat(v.getAttribute('data-rate')) || 1;   /* its speed (data-rate: GALVANY's plays at half, 2026-11-17); the default as well, which loading the file resets the speed to */
+    v.defaultPlaybackRate = rate; v.playbackRate = rate;
+    /* data-wide (Bandcamp's, 2026-11-17, Werner: "only zoom out when the player is out of view, keep the zoomed in version
+       of the player as is"): the stretches, from:to in seconds, where the reel pulls back to the whole Bandcamp page and
+       the player sits at its edge. The reel fills its panel (--cover: how far the whole frame is grown to fill it, set
+       here as the panel's size changes) and shrinks to the whole frame (.is-wide) for those stretches only */
+    var wide = (v.getAttribute('data-wide') || '').split(',').filter(Boolean).map(function (w) { return w.split(':').map(parseFloat); });
+    var side = function () {}, crop = parseFloat(v.getAttribute('data-crop')) || 0, last = 0, ws = 1, wx = '';
+    if (wide.length) {
+      var box = v.closest('.cshot');
+      var fit = function () {
+        var r = box.getBoundingClientRect(), W = parseFloat(box.style.getPropertyValue('--w')) || 16, H = parseFloat(box.style.getPropertyValue('--h')) || 9;
+        if (!r.width || !r.height) return;
+        var cw = Math.min(r.width, r.height * W / H), ch = cw * H / W, cover = Math.max(r.width / cw, r.height / ch);
+        box.style.setProperty('--cover', cover.toFixed(4));
+        /* --ws: how far it stays grown in a wide shot: the frame's left (data-crop, a share of its width: margin and
+           Bandcamp's own header) may go, its right edge stays on the panel's; never so far that the top or bottom go */
+        ws = Math.max(1, Math.min(1 / (1 - crop), r.height / ch, cover));
+        box.style.setProperty('--ws', ws.toFixed(4));
+      };
+      fit();
+      if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else window.addEventListener('resize', fit);
+      side = function () {
+        var t = v.currentTime, hit = wide.filter(function (w) { return t >= w[0] && t < w[1]; })[0], on = !!hit;
+        /* a stretch's third number moves the frame left (-) or right, in % of the panel, where its left is cut (ws > 1):
+           Bandcamp's last wide shot, whose player ended almost on the panel's edge (2026-11-17, Werner: "shift the video a
+           bit more to the left on the last screen") */
+        var x = hit && hit[2] && ws > 1 ? hit[2] + '%' : '0%';
+        if (x !== wx) { v.style.setProperty('--wx', x); wx = x; }
+        /* back at the start (the loop, through the reel's own fade to black and back): the zoom changes at once, in the
+           dark, instead of growing over the next close-up (2026-11-17, Werner: "the last zoom out ... feels a bit janky") */
+        if (t < last - 1 && on !== v.classList.contains('is-wide')) {
+          v.classList.add('snap'); v.classList.toggle('is-wide', on); void v.offsetWidth;
+          requestAnimationFrame(function () { v.classList.remove('snap'); });
+        } else v.classList.toggle('is-wide', on);
+        last = t;
+      };
+    }
+    var loop = function () { if (to && v.currentTime >= to) v.currentTime = from; side(); };
+    /* data-bar (GALVANY's, 2026-11-17, Werner: "on the os portal when you zoom into the content part of the apple bar is
+       visible (top beige part) can you hide this part (or zoom in slightly more) so it is cut off"): moments and how much
+       of the frame's top to cut, "seconds:share", in between drawn as a straight line. Where the reel fills the frame with
+       the app, the window's title bar runs across its top; the cut follows it (it grows as the camera moves in, shrinks as
+       the bar slides out); the box's top edge comes down by as much (css: --ct). Read every frame while it plays */
+    var bar = (v.getAttribute('data-bar') || '').trim().split(/\s+/).filter(Boolean).map(function (k) { return k.split(':').map(parseFloat); });
+    if (bar.length) {
+      var ct = -1, cut = function () {
+        var t = v.currentTime, f = 0, i;
+        for (i = 1; i < bar.length; i++) if (t >= bar[i - 1][0] && t < bar[i][0]) { f = bar[i - 1][1] + (bar[i][1] - bar[i - 1][1]) * (t - bar[i - 1][0]) / (bar[i][0] - bar[i - 1][0]); break; }
+        if (Math.abs(f - ct) > 0.0003) { v.style.setProperty('--ct', f.toFixed(4)); ct = f; }
+      };
+      var raf = 0, tick = function () { cut(); raf = v.paused ? 0 : requestAnimationFrame(tick); };
+      v.addEventListener('play', function () { if (!raf) raf = requestAnimationFrame(tick); });
+      v.addEventListener('seeked', cut); v.addEventListener('timeupdate', cut);
+    }
     v.addEventListener('timeupdate', loop);
     if (v.requestVideoFrameCallback) { var each = function () { loop(); v.requestVideoFrameCallback(each); }; v.requestVideoFrameCallback(each); }
     v.addEventListener('ended', function () { v.currentTime = from; v.play().catch(function () {}); });
