@@ -22,7 +22,10 @@
      the nav's button is pressed; the pick is kept for later visits (the script in the head applies it before the first
      paint). Where the browser can, the switch is the hero's wave (Werner, later that day: "the ripple effect from the
      hero when you switch"): the new colours arrive square by square on the hero's grid, from the button outwards,
-     with a band of lit squares at the front (css: html.theming, .tw). It was a plain circle at first */
+     with a soft light at the front (css: html.theming, .tw). It was a plain circle at first. The band of lit squares
+     that ran behind the front, each outlined and fading over six squares, is gone since 2026-11-18 (Werner: "on
+     swapping from light to dark mode, the are traces of lines on the screen that fade away after a short time, please
+     remove these") */
   (function () {
     var btn = d.querySelector('.mode'), r = d.documentElement, mq = null;
     if (!btn) return;
@@ -48,7 +51,7 @@
       s = (W - 2 * m) / (W <= 760 ? 16 : 32);
       return { c: s, x0: m, y0: -(scrollY % s) };
     };
-    var DUR = 600, DEEP = 6, wave = 0;   /* 600ms (2026-11-17, Werner: "the light to dark mode interaction and vice versa is too fast, can you reduce the speed to 600ms"; it was 400 after Juno's brief, 1150 before) */                                     /* the switch's length (ms), and the lit band's depth in squares */
+    var DUR = 1200, DEEP = 6, wave = 0;   /* 1200ms, half the speed of 600 (2026-11-18, Werner: "The dark/light mode interaction still feels too fast can you reduce it in half"); 600 since 2026-11-17 ("too fast, can you reduce the speed to 600ms"); it was 400 after Juno's brief, 1150 before */                                     /* the switch's length (ms), and the lit band's depth in squares */
     var ease = function (t) { return 1 - (1 - t) * (1 - t); };
     btn.addEventListener('click', function () {
       var to = dark() ? 'light' : 'dark', me = ++wave, cv = null;
@@ -60,7 +63,7 @@
       var L = lattice(), c = L.c, W = r.clientWidth, H = innerHeight, b = btn.getBoundingClientRect();
       var ox = b.left + b.width / 2, oy = b.top + b.height / 2, B = DEEP * c;
       var far = Math.sqrt(Math.pow(Math.max(ox, W - ox), 2) + Math.pow(Math.max(oy, H - oy), 2)) + c, end = far + B;
-      var i0 = Math.floor(-L.x0 / c) - 1, i1 = Math.ceil((W - L.x0) / c), j0 = Math.floor(-L.y0 / c) - 1, j1 = Math.ceil((H - L.y0) / c);
+      var j0 = Math.floor(-L.y0 / c) - 1, j1 = Math.ceil((H - L.y0) / c);
       /* what has turned at reach R: on each row of squares, the run whose middles are within R of the button (one run a
          row, as a circle crosses a row once), as a path of rectangles */
       var turned = function (R) {
@@ -77,8 +80,8 @@
       };
       var frames = [], n = Math.ceil(DUR / 16), k;
       for (k = 0; k <= n; k++) frames.push({ offset: k / n, clipPath: turned(ease(k / n) * end), easing: 'step-end' });
-      /* the lit band, drawn as on the hero (js/heroes.js): a soft light under the front, and each square it has passed
-         comes up violet and fades over the band's depth */
+      /* the light at the front: a soft glow of the new accent, deepest just behind the front, over the band's depth
+         (DEEP squares); no squares or lines of its own */
       cv = d.createElement('canvas');
       var cx = cv.getContext && cv.getContext('2d'), dpr = Math.min(window.devicePixelRatio || 1, 2);
       cv.className = 'tw'; cv.setAttribute('aria-hidden', 'true');
@@ -87,21 +90,11 @@
       var draw = function (now) {
         if (me !== wave || !cx) { drop(); return; }
         if (!t0) { t0 = now; acc = getComputedStyle(r).getPropertyValue('--acc').trim() || '124,107,255'; }   /* the new colours' accent: lime into dark, violet into light */
-        var t = Math.min(1, (now - t0) / DUR), R = ease(t) * end, i, j, x, y, dist, u, al, g;
-        cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.globalAlpha = 1; cx.clearRect(0, 0, W, H);
+        var t = Math.min(1, (now - t0) / DUR), R = ease(t) * end, g;
+        cx.setTransform(dpr, 0, 0, dpr, 0, 0); cx.clearRect(0, 0, W, H);
         g = cx.createRadialGradient(ox, oy, Math.max(0, R - B), ox, oy, R + c);
         g.addColorStop(0, A('0')); g.addColorStop(0.74, A('.16')); g.addColorStop(1, A('0'));
         cx.fillStyle = g; cx.fillRect(0, 0, W, H);
-        for (j = j0; j <= j1; j++) for (i = i0; i <= i1; i++) {
-          x = L.x0 + i * c; y = L.y0 + j * c;
-          dist = Math.sqrt((x + c / 2 - ox) * (x + c / 2 - ox) + (y + c / 2 - oy) * (y + c / 2 - oy));
-          u = (R - dist) / B;
-          if (u <= 0 || u >= 1) continue;
-          al = u < 0.12 ? u / 0.12 : Math.pow(1 - (u - 0.12) / 0.88, 1.6);
-          cx.globalAlpha = al;
-          cx.fillStyle = A('.2'); cx.fillRect(x, y, c, c);
-          cx.strokeStyle = A('.6'); cx.strokeRect(x + 0.5, y + 0.5, c - 1, c - 1);
-        }
         if (t < 1) requestAnimationFrame(draw); else drop();
       };
       r.classList.add('theming');
@@ -315,7 +308,14 @@
         var r = box.getBoundingClientRect(), W = parseFloat(box.style.getPropertyValue('--w')) || 16, H = parseFloat(box.style.getPropertyValue('--h')) || 9;
         if (!r.width || !r.height) return;
         var cw = Math.min(r.width, r.height * W / H), ch = cw * H / W, cover = Math.max(r.width / cw, r.height / ch);
-        box.style.setProperty('--cover', cover.toFixed(4));
+        /* the close-up a little short of filling the panel (2026-11-18, Werner: "zoom in a little bit less, so it doesnt
+           look to pixelated on large screens"): 85% of the fill, and never more than 0.9 of a CSS pixel per pixel of the
+           video, so a tall window doesn't blow it up further (the fill follows the panel's height: at 2560 by 1440 it was
+           1.07, twice that on a Retina screen; 0.8 brought the frame's edge, a sliver of the Bandcamp page, into the
+           panel); never smaller than the whole frame. What it leaves of the panel above and below is the panel's black,
+           the reel's own, the frame's edges fading into it (css). The still takes the same size (css: .sized) */
+        cover = Math.max(1, Math.min(cover * 0.85, 0.9 * W / cw));
+        box.style.setProperty('--cover', cover.toFixed(4)); box.classList.add('sized');
         /* --ws: how far it stays grown in a wide shot: the frame's left (data-crop, a share of its width: margin and
            Bandcamp's own header) may go, its right edge stays on the panel's; never so far that the top or bottom go */
         ws = Math.max(1, Math.min(1 / (1 - crop), r.height / ch, cover));
