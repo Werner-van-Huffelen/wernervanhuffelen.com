@@ -65,18 +65,26 @@
       var far = Math.sqrt(Math.pow(Math.max(ox, W - ox), 2) + Math.pow(Math.max(oy, H - oy), 2)) + c, end = far + B;
       var j0 = Math.floor(-L.y0 / c) - 1, j1 = Math.ceil((H - L.y0) / c);
       /* what has turned at reach R: on each row of squares, the run whose middles are within R of the button (one run a
-         row, as a circle crosses a row once), as a path of rectangles */
+         row, as a circle crosses a row once). The rows with a run follow one another (the widest at the button's row), so
+         together they are one stepped shape: drawn as its outline, down the right-hand steps and back up the left. Not
+         as a rectangle a row (until 2026-11-19, Werner: "there are still some visible lines (traces that dissappear)
+         shortly after you toggle between ligth and dark mode"): drawn on the graphics card, rectangles that meet edge to
+         edge can leave a hairline of the old colours along each row's edge until the switch ends */
       var turned = function (R) {
-        var p = '', j, y, dy, h, a, z;
+        var rows = [], j, y, dy, h, a, z, p, i, f = function (v) { return v.toFixed(1); };
         for (j = j0; j <= j1; j++) {
           y = L.y0 + j * c; dy = y + c / 2 - oy;
           if (Math.abs(dy) >= R) continue;
           h = Math.sqrt(R * R - dy * dy);
           a = Math.ceil((ox - h - L.x0 - c / 2) / c); z = Math.floor((ox + h - L.x0 - c / 2) / c);
           if (z < a) continue;
-          p += 'M' + (L.x0 + a * c).toFixed(1) + ' ' + y.toFixed(1) + 'h' + ((z - a + 1) * c).toFixed(1) + 'v' + c.toFixed(1) + 'h' + (-(z - a + 1) * c).toFixed(1) + 'Z';
+          rows.push([y, L.x0 + a * c, L.x0 + (z + 1) * c]);   /* top, left, right */
         }
-        return 'path("' + (p || 'M0 0Z') + '")';
+        if (!rows.length) return 'path("M0 0Z")';
+        p = 'M' + f(rows[0][1]) + ' ' + f(rows[0][0]);
+        for (i = 0; i < rows.length; i++) p += 'H' + f(rows[i][2]) + 'V' + f(rows[i][0] + c);
+        for (i = rows.length - 1; i >= 0; i--) p += 'H' + f(rows[i][1]) + 'V' + f(rows[i][0]);
+        return 'path("' + p + 'Z")';
       };
       var frames = [], n = Math.ceil(DUR / 16), k;
       for (k = 0; k <= n; k++) frames.push({ offset: k / n, clipPath: turned(ease(k / n) * end), easing: 'step-end' });
