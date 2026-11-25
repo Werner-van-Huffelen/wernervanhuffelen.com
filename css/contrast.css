@@ -704,8 +704,9 @@ html:not(.js) .svc .tog{display:none}
 .ctags li{min-width:0;padding-right:12px;font-size:var(--fs-ui)}
 @media (min-width:900px){ .told>.lab{align-self:start} .ctags{grid-template-columns:repeat(3,minmax(0,1fr))} }
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px var(--g);margin-top:clamp(56px,7vw,112px);padding-top:18px;border-top:1px solid var(--line)}
+.stat{display:flex;flex-direction:column} .stat b{flex:1 0 auto}   /* labels line up when one value takes two lines (GALVANY, 2026-11-25) */
 .stat b{display:block;font-size:var(--h2);font-weight:640;letter-spacing:-.06em;line-height:.9;color:var(--stop);font-variant-numeric:tabular-nums}
-.stat b.sm{font-size:var(--fs-card);line-height:1.46}
+.stat b.sm{font-size:var(--fs-card);line-height:1.46;letter-spacing:-.02em}   /* 2026-11-25 (Werner: the long GALVANY stats read cramped at -.06em) */
 .stat span{display:flex;gap:8px;margin-top:12px;color:var(--ink)} .stat span::before{content:"";width:18px;height:1px;background:var(--ink);margin-top:.7em}
 .decs{display:grid;gap:20px}
 .dec{display:grid;gap:20px;padding:clamp(20px,2.4vw,36px);background:var(--card);border-radius:var(--r)}
